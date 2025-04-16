@@ -67,16 +67,16 @@ export default function Home() {
     const kernfaecherCounts = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0 };
     const faecherCounts = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0 };
 
-    const kernfaecher3orBetter = Object.values(grades.kernfaecher).filter(grade => grade !== '6' && grade !== '5' && grade !== '4' && grade !== '').length;
-    const faecher3orBetter = Object.values(grades.faecher).filter(grade => grade !== '6' && grade !== '5' && grade !== '4' && grade !== '').length;
+    let kernfaecher3orBetter = Object.values(grades.kernfaecher).filter(grade => grade !== '6' && grade !== '5' && grade !== '4' && grade !== '').length;
+    let faecher3orBetter = Object.values(grades.faecher).filter(grade => grade !== '6' && grade !== '5' && grade !== '4' && grade !== '').length;
     //combine kernfaecher and faecher 3orBetter
-    const kernfaecherFaecher3orBetter = kernfaecher3orBetter + faecher3orBetter;
+    let kernfaecherFaecher3orBetter = kernfaecher3orBetter + faecher3orBetter;
     // Count Kernfaecher and Fächer grades that are 2 or better
-    const kernfaecher2orBetter = Object.values(grades.kernfaecher).filter(grade => grade !== '6' && grade !== '5' && grade !== '4' && grade !== '3' && grade !== '').length;
-    const faecher2orBetter = Object.values(grades.faecher).filter(grade => grade !== '6' && grade !== '5' && grade !== '4' && grade !== '3' && grade !== '').length;
+    let kernfaecher2orBetter = Object.values(grades.kernfaecher).filter(grade => grade !== '6' && grade !== '5' && grade !== '4' && grade !== '3' && grade !== '').length;
+    let faecher2orBetter = Object.values(grades.faecher).filter(grade => grade !== '6' && grade !== '5' && grade !== '4' && grade !== '3' && grade !== '').length;
     
     // combine kernfaecher and faecher 2 or better
-    const kernfaecherFaecher2orBetter = kernfaecher2orBetter + faecher2orBetter;
+    let kernfaecherFaecher2orBetter = kernfaecher2orBetter + faecher2orBetter;
 
      
     // Count Kernfaecher grades
@@ -116,15 +116,42 @@ export default function Home() {
       return;
     }
 
-    // 2x5 in Fächer und dafür 2x eine 3 oder weniger in Kernfächer und Fächer ist bestanden, wenn nicht, dann nicht bestanden
-    if (faecherCounts['5'] >= 2 && kernfaecherFaecher3orBetter >= 2) {
+    // 1x 6 in Faecher und 2 in Kernfächer und/oder Fächer
+    if (faecherCounts['6']==1 && kernfaecherFaecher2orBetter < 2) {
       setGradeStats({
-        status: 'Nicht bestanden: 2x 5 in Fächer und nicht genug 3er.',
+        status: 'Nicht bestanden: 1x 6 in Fächer und keine 2 zweien in Kernfächer und/oder Fächer.',
         kernfaecher: '',
         faecher: ''
       });
       return;
     }
+    // wenn 1x 6 in Fächer und 2x eine 2 oder weniger in Fächer und/oder Kernfächer, dann lösch die guten Noten aus den Fächer und Kernfächer 
+    else if (faecherCounts['6'] == 1 && kernfaecherFaecher2orBetter >= 2) {
+      kernfaecherFaecher2orBetter -= 2;
+      kernfaecherFaecher3orBetter -= 2;
+
+      // wenn in Fächer zwei 2en und/oder 1en sind, dann lösche die 2en aus fächer3orBetter
+      if (faecher2orBetter >= 2) {
+        faecher3orBetter -= 2;
+        faecher2orBetter -= 2;
+      }
+
+      // wenn in Fächer eine 2 und in Kernfächer eine 2 oder besser ist, dann lösche die 2 aus fächer3orBetter, kernfächer3orBetter
+      else if (faecher2orBetter == 1 && kernfaecher2orBetter >= 1) {
+        faecher3orBetter -= 1;
+        kernfaecher3orBetter -= 1;
+        faecher2orBetter -= 1;
+        kernfaecher2orBetter -= 1;
+      }
+      // else if wenn in Kernfächer 2 besser als 2 sind, dann lösche die 2 aus kernfächer3orBetter
+      else if (kernfaecher2orBetter >= 2) {
+        kernfaecher3orBetter -= 2;
+        kernfaecher2orBetter -= 2;
+      }
+    } 
+
+
+
 
     // 1x 5 in Kernfächer und 1x 5 in Fächer und dafür 1x eine 3 oder weniger in Kernfächer und Fächer ist bestanden, wenn nicht, dann nicht bestanden
     if (kernfaecherCounts['5'] == 1 && faecherCounts['5'] == 1 && (kernfaecher3orBetter < 1 && faecher3orBetter < 1 )) {
@@ -136,10 +163,25 @@ export default function Home() {
       return;
     }
 
-    // 1x 6 in Faecher und 2 in Kernfächer und/oder Fächer
-    if (faecherCounts['6']==1 && kernfaecherFaecher2orBetter < 2) {
+    // wenn 1x 5 in Kernfächer und 1x 5 in Fächer und dafür 1x eine 3 oder weniger in Kernfächer und Fächer ist, dann lösche 1x aus faecher3orBetter und 1x aus kernfaecher3orBetter
+    else if (kernfaecherCounts['5'] == 1 && faecherCounts['5'] == 1 && (kernfaecher3orBetter >= 1 || faecher3orBetter >= 1 )) {
+      kernfaecherFaecher3orBetter -= 1;
+      if (faecher3orBetter >= 1) {
+        faecher3orBetter -= 1;
+      }
+      else if (kernfaecher3orBetter >= 1) {
+        kernfaecher3orBetter -= 1;
+      }
+      return;
+    }
+
+
+
+    // 2x5 in Fächer und dafür 2x eine 3 oder weniger in Kernfächer und Fächer ist bestanden, wenn nicht, dann nicht bestanden
+    if (faecherCounts['5'] >= 2 && kernfaecherFaecher3orBetter < 2) {
+      console.log(kernfaecherFaecher3orBetter, "warum hier, wenn das hier kleiner 2 ist?");
       setGradeStats({
-        status: 'Nicht bestanden: 1x 6 in Fächer und keine 2 zweien in Kernfächer und/oder Fächer.',
+        status: 'Nicht bestanden: 2x 5 in Fächer und nicht genug 3er.',
         kernfaecher: '',
         faecher: ''
       });
@@ -277,6 +319,8 @@ export default function Home() {
         {/* Textfield: "Vielen Dank für Ihren Besuch" */}
         <p className="text-sm text-center text-foreground">
           Vielen Dank für Ihren Besuch </p>
+          <div>{gradeStats.kernfaecher}</div>
+              <div>{gradeStats.faecher}</div>
       </footer>
     </div>
   );
