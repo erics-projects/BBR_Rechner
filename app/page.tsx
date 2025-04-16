@@ -169,17 +169,21 @@ export default function Home() {
   };
 
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <h1>Dein BBR-Rechner für Berlin</h1>
+    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
+      <main className="flex flex-col gap-[32px] row-start-2 items-center">
+        <div className="text-center mb-8 flex flex-col items-center gap-6">
+          <Image
+            src="/elouco_logo.png"
+            alt="Elouco logo"
+            width={64}
+            height={64}
+            className="w-16 h-16"
+            priority
+          />
+          <h1 className="text-4xl font-bold text-gray-800 dark:text-white">
+            BBR-Notenrechner
+          </h1>
+        </div>
 
         <div className="flex flex-col gap-6 w-full max-w-4xl">
           <div className="space-y-4">
