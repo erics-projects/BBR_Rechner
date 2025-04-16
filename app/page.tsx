@@ -1,0 +1,279 @@
+'use client';
+import Image from "next/image";
+import { useState } from "react";
+
+interface KernfaecherInputs {
+  deutsch: string;
+  mathe: string;
+  ersteFremdsprache: string;
+}
+
+interface FaecherInputs {
+  biologie: string;
+  physik: string;
+  chemie: string;
+  geographie: string;
+  geschichte: string;
+  politik: string;
+  musik: string;
+  kunst: string;
+  sport: string;
+}
+
+interface AllGradeInputs {
+  kernfaecher: KernfaecherInputs;
+  faecher: FaecherInputs;
+}
+
+export default function Home() {
+  const [grades, setGrades] = useState<AllGradeInputs>({
+    kernfaecher: {
+      deutsch: '',
+      mathe: '',
+      ersteFremdsprache: ''
+    },
+    faecher: {
+      biologie: '',
+      physik: '',
+      chemie: '',
+      geographie: '',
+      geschichte: '',
+      politik: '',
+      musik: '',
+      kunst: '',
+      sport: ''
+    }
+  });
+
+  const handleInputChange = (category: 'kernfaecher' | 'faecher', subject: string) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setGrades(prev => ({
+        ...prev,
+        [category]: {
+          ...prev[category],
+          [subject]: e.target.value
+        }
+      }));
+    };
+
+  const [gradeStats, setGradeStats] = useState<{ status: string, kernfaecher: string, faecher: string }>({
+    status: '',
+    kernfaecher: '',
+    faecher: ''
+  });
+
+  const countGrades = () => {
+    // Initialize counters for both categories
+    const kernfaecherCounts = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0 };
+    const faecherCounts = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0 };
+
+    const kernfaecher3orBetter = Object.values(grades.kernfaecher).filter(grade => grade !== '6' && grade !== '5' && grade !== '4' && grade !== '').length;
+    const faecher3orBetter = Object.values(grades.faecher).filter(grade => grade !== '6' && grade !== '5' && grade !== '4' && grade !== '').length;
+    //combine kernfaecher and faecher 3orBetter
+    const kernfaecherFaecher3orBetter = kernfaecher3orBetter + faecher3orBetter;
+    // Count Kernfaecher and Fächer grades that are 2 or better
+    const kernfaecher2orBetter = Object.values(grades.kernfaecher).filter(grade => grade !== '6' && grade !== '5' && grade !== '4' && grade !== '3' && grade !== '').length;
+    const faecher2orBetter = Object.values(grades.faecher).filter(grade => grade !== '6' && grade !== '5' && grade !== '4' && grade !== '3' && grade !== '').length;
+    
+    // combine kernfaecher and faecher 2 or better
+    const kernfaecherFaecher2orBetter = kernfaecher2orBetter + faecher2orBetter;
+
+     
+    // Count Kernfaecher grades
+    Object.values(grades.kernfaecher).forEach(grade => {
+      if (grade !== '') {
+        kernfaecherCounts[grade as keyof typeof kernfaecherCounts]++;
+      }
+    });
+
+    // Count regular Faecher grades
+    Object.values(grades.faecher).forEach(grade => {
+      if (grade !== '') {
+        faecherCounts[grade as keyof typeof faecherCounts]++;
+      }
+    });
+
+    // Check for failing grades (5 or 6) using the count objects
+    const hasFiveOrSixKernfaecher = kernfaecherCounts['5'] > 0 || kernfaecherCounts['6'] > 0;
+    const hasFiveOrSixFaecher = faecherCounts['5'] > 0 || faecherCounts['6'] > 0;
+
+    // wenn es eine 6 im Kernfach gibt, dann ist es nicht bestanden und/oder zwei 5 in Kernfächern
+    if (kernfaecherCounts['6'] > 0 || kernfaecherCounts['5'] > 1) {
+      setGradeStats({
+        status: 'Nicht bestanden: 6 oder 2x5 in einem Kernfach.',
+        kernfaecher: '',
+        faecher: ''
+      });
+      return;
+    }      
+    // und wenn es zwei 6er gibt in faechern dann ist es auch nicht bestanden
+    if (faecherCounts['6'] > 1) {
+      setGradeStats({
+        status: 'Nicht bestanden: 2x 6 in Fächer.',
+        kernfaecher: '',
+        faecher: ''
+      });
+      return;
+    }
+
+    // 2x5 in Fächer und dafür 2x eine 3 oder weniger in Kernfächer und Fächer ist bestanden, wenn nicht, dann nicht bestanden
+    if (faecherCounts['5'] >= 2 && kernfaecherFaecher3orBetter >= 2) {
+      setGradeStats({
+        status: 'Nicht bestanden: 2x 5 in Fächer und nicht genug 3er.',
+        kernfaecher: '',
+        faecher: ''
+      });
+      return;
+    }
+
+    // 1x 5 in Kernfächer und 1x 5 in Fächer und dafür 1x eine 3 oder weniger in Kernfächer und Fächer ist bestanden, wenn nicht, dann nicht bestanden
+    if (kernfaecherCounts['5'] == 1 && faecherCounts['5'] == 1 && (kernfaecher3orBetter < 1 && faecher3orBetter < 1 )) {
+      setGradeStats({
+        status: 'Nicht bestanden: 1x 5 in Kernfächer und 1x 5 in Fächer und nicht genug 3er.',
+        kernfaecher: '',
+        faecher: ''
+      });
+      return;
+    }
+
+    // 1x 6 in Faecher und 2 in Kernfächer und/oder Fächer
+    if (faecherCounts['6']==1 && kernfaecherFaecher2orBetter < 2) {
+      setGradeStats({
+        status: 'Nicht bestanden: 1x 6 in Fächer und keine 2 zweien in Kernfächer und/oder Fächer.',
+        kernfaecher: '',
+        faecher: ''
+      });
+      return;
+    }
+
+
+    // Create status message with detailed information
+    const statusMessage = 'Bestanden: ';
+
+    // Create summary strings
+    const kernfaecherSummary = `Kernfächer: ${Object.entries(kernfaecherCounts)
+      .filter(([_, count]) => count > 0)
+      .map(([grade, count]) => `Note ${grade}: ${count}x`)
+      .join(', ')}`;
+
+    const faecherSummary = `Fächer: ${Object.entries(faecherCounts)
+      .filter(([_, count]) => count > 0)
+      .map(([grade, count]) => `Note ${grade}: ${count}x`)
+      .join(', ')}`;
+
+    setGradeStats({
+      status: statusMessage,
+      kernfaecher: kernfaecherSummary,
+      faecher: faecherSummary
+    });
+  };
+
+  return (
+    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
+        <Image
+          className="dark:invert"
+          src="/next.svg"
+          alt="Next.js logo"
+          width={180}
+          height={38}
+          priority
+        />
+        <h1>Dein BBR-Rechner für Berlin</h1>
+
+        <div className="flex flex-col gap-6 w-full max-w-4xl">
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Kernfächer</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {Object.entries(grades.kernfaecher).map(([subject, value]) => {
+                const displayName = {
+                  deutsch: 'Deutsch',
+                  mathe: 'Mathematik',
+                  ersteFremdsprache: 'Erste Fremdsprache'
+                }[subject] || subject;
+                
+                return (
+                  <div key={subject} className="flex flex-col gap-2">
+                    <label className="text-sm font-medium">
+                      {displayName}
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="6"
+                      step="1"
+                      value={value}
+                      onChange={handleInputChange('kernfaecher', subject)}
+                      className="border rounded p-2 dark:bg-gray-800"
+                      placeholder="1-6"
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Fächer</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {Object.entries(grades.faecher).map(([subject, value]) => {
+                const displayName = {
+                  biologie: 'Biologie',
+                  physic: 'Physik',
+                  chemie: 'Chemie',
+                  geographie: 'Geographie',
+                  geschichte: 'Geschichte',
+                  politik: 'Politik',
+                  musik: 'Musik',
+                  kunst: 'Kunst',
+                  sport: 'Sport'
+                }[subject] || subject;
+
+                return (
+                  <div key={subject} className="flex flex-col gap-2">
+                    <label className="text-sm font-medium">
+                      {displayName}
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="6"
+                      step="1"
+                      value={value}
+                      onChange={handleInputChange('faecher', subject)}
+                      className="border rounded p-2 dark:bg-gray-800"
+                      placeholder="1-6"
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <button
+            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
+            onClick={countGrades}
+          >
+            Berechnen
+          </button>
+          {gradeStats.status && (
+            <div className="bg-transparent text-white font-medium flex flex-col gap-2">
+              <div className={gradeStats.status.includes('Bestanden') ? 'text-green-400' : 'text-red-400'}>
+                {gradeStats.status}
+              </div>
+              <div>{gradeStats.kernfaecher}</div>
+              <div>{gradeStats.faecher}</div>
+            </div>
+          )}
+        </div>
+      </main>
+      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
+        {/* Textfield: "Vielen Dank für Ihren Besuch" */}
+        <p className="text-sm text-center text-foreground">
+          Vielen Dank für Ihren Besuch </p>
+      </footer>
+    </div>
+  );
+}
