@@ -189,6 +189,7 @@ export default function Home() {
     }
 
 
+
     // Create status message with detailed information
     const statusMessage = 'Bestanden: ';
 
@@ -225,6 +226,18 @@ export default function Home() {
           <h1 className="text-4xl font-bold text-gray-800 dark:text-white">
             BBR-Notenrechner
           </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-400">
+            Berufsbildungsreife (BBR) Notenrechner für Berlin
+          </p>
+    
+          <a
+            href="https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abschluesse-an-der-iss-nach-klasse-9-und-10/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+          >
+            Alle Informationen finden Sie hier: berlin.de/...
+          </a>
         </div>
 
         <div className="flex flex-col gap-6 w-full max-w-4xl">
@@ -319,8 +332,6 @@ export default function Home() {
         {/* Textfield: "Vielen Dank für Ihren Besuch" */}
         <p className="text-sm text-center text-foreground">
           Vielen Dank für Ihren Besuch </p>
-          <div>{gradeStats.kernfaecher}</div>
-              <div>{gradeStats.faecher}</div>
       </footer>
     </div>
   );
