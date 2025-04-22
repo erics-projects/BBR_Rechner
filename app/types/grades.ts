@@ -1,19 +1,24 @@
+export interface GradeWithLevel {
+  grade: string;
+  level: 'E' | 'G';
+}
+
 export interface KernfaecherInputs {
-  deutsch: string;
-  mathe: string;
-  ersteFremdsprache: string;
+  deutsch: GradeWithLevel;
+  mathe: GradeWithLevel;
+  ersteFremdsprache: GradeWithLevel;
 }
 
 export interface FaecherInputs {
-  biologie: string;
-  physik: string;
-  chemie: string;
-  geographie: string;
-  geschichte: string;
-  politik: string;
-  musik: string;
-  kunst: string;
-  sport: string;
+  biologie: GradeWithLevel;
+  physik: GradeWithLevel;
+  chemie: GradeWithLevel;
+  geographie: GradeWithLevel;
+  geschichte: GradeWithLevel;
+  politik: GradeWithLevel;
+  musik: GradeWithLevel;
+  kunst: GradeWithLevel;
+  sport: GradeWithLevel;
 }
 
 export interface AllGradeInputs {
@@ -22,14 +27,14 @@ export interface AllGradeInputs {
 }
 
 export interface ExamGrades {
-  deutsch: string;
-  mathematik: string;
-  fremdsprache: string;
-  praesentation: string;
+  deutsch: GradeWithLevel;
+  mathematik: GradeWithLevel;
+  fremdsprache: GradeWithLevel;
+  praesentation: GradeWithLevel;
 }
 
 export interface GradeStats {
   status: string;
-  kernfaecher: string;
-  faecher: string;
+  average: number;
+  uebergangGymnasialeOberstufe: boolean;
 }

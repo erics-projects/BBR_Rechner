@@ -6,59 +6,96 @@ import { ResultsDisplay } from "./components/ResultsDisplay";
 import { ExamGradeInput } from "./components/ExamGradeInput";
 import { GradeCalculator } from "./services/gradeCalculator";
 import { ExamCalculator } from "./services/examCalculator";
-import { AllGradeInputs, GradeStats, ExamGrades } from "./types/grades";
+import { AllGradeInputs, GradeStats, ExamGrades, GradeWithLevel } from "./types/grades";
 
 export default function Home() {
   const [grades, setGrades] = useState<AllGradeInputs>({
     kernfaecher: {
-      deutsch: '',
-      mathe: '',
-      ersteFremdsprache: ''
+      deutsch: { grade: '', level: 'G' },
+      mathe: { grade: '', level: 'G' },
+      ersteFremdsprache: { grade: '', level: 'G' }
     },
     faecher: {
-      biologie: '',
-      physik: '',
-      chemie: '',
-      geographie: '',
-      geschichte: '',
-      politik: '',
-      musik: '',
-      kunst: '',
-      sport: ''
+      biologie: { grade: '', level: 'G' },
+      physik: { grade: '', level: 'G' },
+      chemie: { grade: '', level: 'G' },
+      geographie: { grade: '', level: 'G' },
+      geschichte: { grade: '', level: 'G' },
+      politik: { grade: '', level: 'G' },
+      musik: { grade: '', level: 'G' },
+      kunst: { grade: '', level: 'G' },
+      sport: { grade: '', level: 'G' }
     }
   });
 
   const [examGrades, setExamGrades] = useState<ExamGrades>({
-    deutsch: '',
-    mathematik: '',
-    fremdsprache: '',
-    praesentation: ''
+    deutsch: { grade: '', level: 'G' },
+    mathematik: { grade: '', level: 'G' },
+    fremdsprache: { grade: '', level: 'G' },
+    praesentation: { grade: '', level: 'G' }
   });
 
   const [gradeStats, setGradeStats] = useState<GradeStats>({
     status: '',
-    kernfaecher: '',
-    faecher: ''
+    average: 0,
+    uebergangGymnasialeOberstufe: false
   });
 
   const [examResult, setExamResult] = useState('');
 
   const handleInputChange = (category: 'kernfaecher' | 'faecher', subject: string) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      setGrades(prev => ({
-        ...prev,
-        [category]: {
+      setGrades(prev => {
+        const updatedCategory = {
           ...prev[category],
-          [subject]: e.target.value
-        }
-      }));
+          [subject]: {
+            ...(prev[category][subject as keyof typeof prev[typeof category]] as GradeWithLevel),
+            grade: e.target.value
+          }
+        };
+        return {
+          ...prev,
+          [category]: updatedCategory
+        };
+      });
+    };
+
+  const handleLevelChange = (category: 'kernfaecher' | 'faecher', subject: string) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setGrades(prev => {
+        const updatedCategory = {
+          ...prev[category],
+          [subject]: {
+            ...(prev[category][subject as keyof typeof prev[typeof category]] as GradeWithLevel),
+            level: e.target.checked ? 'E' : 'G'
+          }
+        };
+        return {
+          ...prev,
+          [category]: updatedCategory
+        };
+      });
     };
 
   const handleExamInputChange = (field: keyof ExamGrades) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setExamGrades(prev => ({
         ...prev,
-        [field]: e.target.value
+        [field]: {
+          ...prev[field],
+          grade: e.target.value
+        }
+      }));
+    };
+
+  const handleExamLevelChange = (field: keyof ExamGrades) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setExamGrades(prev => ({
+        ...prev,
+        [field]: {
+          ...prev[field],
+          level: e.target.checked ? 'E' : 'G'
+        }
       }));
     };
 
@@ -104,6 +141,7 @@ export default function Home() {
         <GradeInput 
           grades={grades}
           onInputChange={handleInputChange}
+          onLevelChange={handleLevelChange}
         />
 
         <div className="flex items-center gap-4">
@@ -119,6 +157,7 @@ export default function Home() {
         <ExamGradeInput 
           examGrades={examGrades}
           onInputChange={handleExamInputChange}
+          onLevelChange={handleExamLevelChange}
           onCalculate={calculateExamGrades}
         />
 
