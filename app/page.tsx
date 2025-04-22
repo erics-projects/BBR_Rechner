@@ -123,7 +123,7 @@ export default function Home() {
         />
 
         {examResult && (
-          <div className={`text-${examResult.includes('bestanden') ? 'green' : 'red'}-400 font-medium mt-4`}>
+          <div className={`font-medium mt-4 ${examResult.includes('bestanden') && !examResult.includes('nicht') ? 'text-green-400' : 'text-red-400'}`}>
             Prüfungen: {examResult}
           </div>
         )}
