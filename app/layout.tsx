@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Abschlussnotenrechner",
+  title: "Abschlussrechner",
   description: "eBBR, BBR und MSA Notenrechner für Berlin",
   icons: [
     { rel: 'icon', url: '/elouco_logo_plain.png' }
