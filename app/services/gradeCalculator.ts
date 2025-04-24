@@ -1,45 +1,74 @@
 import { AllGradeInputs, GradeWithLevel, GradeStats } from '../types/grades';
 
 export class GradeCalculator {
+  private static countELevelGrades(grades: AllGradeInputs): {
+    kernfaecherELevel: number;
+    faecherELevel: number;
+  } {
+    const kernfaecherELevel = Object.values(grades.kernfaecher)
+      .filter(g => g.level === 'E' && g.grade !== '' && parseInt(g.grade) <= 3)
+      .length;
+    
+    const faecherELevel = Object.values(grades.faecher)
+      .filter(g => g.level === 'E' && g.grade !== '' && parseInt(g.grade) <= 3)
+      .length;
+
+    return { kernfaecherELevel, faecherELevel };
+  }
+
   private static checkUebergangGymnasialeOberstufe(
     grades: AllGradeInputs,
     average: number
-  ): boolean {
-    if (average > 3.0) return false;
+  ): { qualified: boolean; reason?: string } {
+    if (average > 3.0) {
+      return {
+        qualified: false,
+        reason: `Notendurchschnitt ${average} ist schlechter als 3,0`
+      };
+    }
 
     // Check if all grades are 4 or better
     const allGrades = [
       ...Object.values(grades.kernfaecher),
       ...Object.values(grades.faecher)
     ];
-    if (allGrades.some(g => g.grade !== '' && parseInt(g.grade) > 4)) return false;
+    if (allGrades.some(g => g.grade !== '' && parseInt(g.grade) > 4)) {
+      return {
+        qualified: false,
+        reason: 'Alle Noten müssen 4 oder besser sein'
+      };
+    }
 
-    // Count E-Level grades that are 3 or better in Kernfaecher
-    const kernfaecherELevel = Object.values(grades.kernfaecher)
-      .filter(g => g.level === 'E' && g.grade !== '' && parseInt(g.grade) <= 3)
-      .length;
-    
-    // Count E-Level grades that are 3 or better in Faecher
-    const faecherELevel = Object.values(grades.faecher)
-      .filter(g => g.level === 'E' && g.grade !== '' && parseInt(g.grade) <= 3)
-      .length;
+    const { kernfaecherELevel, faecherELevel } = this.countELevelGrades(grades);
 
     // Need at least 2 E-Level grades in Kernfaecher with grade 3 or better
-    if (kernfaecherELevel < 2) return false;
+    if (kernfaecherELevel < 2) {
+      return {
+        qualified: false,
+        reason: 'Mindestens 2 E-Kurse in Kernfächern mit Note 3 oder besser benötigt'
+      };
+    }
 
     // Need at least 3 E-Level grades in total with grade 3 or better
     const totalELevel = kernfaecherELevel + faecherELevel;
-    return totalELevel >= 3;
+    if (totalELevel < 3) {
+      return {
+        qualified: false,
+        reason: 'Insgesamt mindestens 3 E-Kurse mit Note 3 oder besser benötigt'
+      };
+    }
+
+    return { qualified: true };
   }
 
   public static calculateGrades(grades: AllGradeInputs): GradeStats {
     // Get all numeric grades
     const kernfaecherGrades = Object.values(grades.kernfaecher)
-      .filter(g => g.grade !== '')
+      .filter(g => g.points !== '')
       .map(g => parseInt(g.grade));
 
     const faecherGrades = Object.values(grades.faecher)
-      .filter(g => g.grade !== '')
+      .filter(g => g.points !== '')
       .map(g => parseInt(g.grade));
 
     // Count grades
@@ -48,9 +77,12 @@ export class GradeCalculator {
 
     if (gradeCount === 0) {
       return {
+        ebbrPassed: false,
+        msaPassed: false,
         status: '',
         average: 0,
-        uebergangGymnasialeOberstufe: false
+        uebergangGymnasialeOberstufe: false,
+        uebergangReason: undefined
       };
     }
 
@@ -64,17 +96,23 @@ export class GradeCalculator {
 
     if (hasSixInKernfaecher || hasMultipleFiveInKernfaecher) {
       return {
+        ebbrPassed: false,
+        msaPassed: false,
         status: 'Nicht bestanden: 6 oder 2x5 in einem Kernfach.',
         average,
-        uebergangGymnasialeOberstufe: false
+        uebergangGymnasialeOberstufe: false,
+        uebergangReason: 'Note 6 oder 2x5 in Kernfächern'
       };
     }
 
     if (hasMultipleSixInFaecher) {
       return {
+        ebbrPassed: false,
+        msaPassed: false,
         status: 'Nicht bestanden: 2x 6 in Fächer.',
         average,
-        uebergangGymnasialeOberstufe: false
+        uebergangGymnasialeOberstufe: false,
+        uebergangReason: '2x Note 6 in Fächern'
       };
     }
 
@@ -86,9 +124,12 @@ export class GradeCalculator {
     const singleSixInFaecher = faecherGrades.filter(g => g === 6).length === 1;
     if (singleSixInFaecher && gradesTwoOrBetter < 2) {
       return {
+        ebbrPassed: false,
+        msaPassed: false,
         status: 'Nicht bestanden: 1x 6 in Fächer und keine 2 zweien in Kernfächer und/oder Fächer.',
         average,
-        uebergangGymnasialeOberstufe: false
+        uebergangGymnasialeOberstufe: false,
+        uebergangReason: 'Note 6 in Fächern ohne ausgleichende Noten'
       };
     }
 
@@ -98,27 +139,44 @@ export class GradeCalculator {
 
     if (fivesInFaecher >= 2 && gradesThreeOrBetter < 2) {
       return {
+        ebbrPassed: false,
+        msaPassed: false,
         status: 'Nicht bestanden: 2x 5 in Fächer und nicht genug 3er.',
         average,
-        uebergangGymnasialeOberstufe: false
+        uebergangGymnasialeOberstufe: false,
+        uebergangReason: '2x Note 5 in Fächern ohne ausreichend gute Noten'
       };
     }
 
     if (fivesInKernfaecher >= 1 && fivesInFaecher >= 1 && gradesThreeOrBetter < 2) {
       return {
+        ebbrPassed: false,
+        msaPassed: false,
         status: 'Nicht bestanden: 1x 5 in Kernfächer und 1x 5 in Fächer und nicht genug 3er.',
         average,
-        uebergangGymnasialeOberstufe: false
+        uebergangGymnasialeOberstufe: false,
+        uebergangReason: 'Note 5 in Kernfach und Fach ohne ausreichend gute Noten'
       };
     }
 
-    // Check Übergang Gymnasiale Oberstufe
-    const uebergangGymnasialeOberstufe = this.checkUebergangGymnasialeOberstufe(grades, average);
+    // Count E-Level grades for MSA and Übergang checks
+    const { kernfaecherELevel, faecherELevel } = this.countELevelGrades(grades);
+    
+    // Check MSA and Übergang Gymnasiale Oberstufe
+    const uebergangResult = this.checkUebergangGymnasialeOberstufe(grades, average);
+
+    // Check MSA (similar to Übergang requirements but with different thresholds)
+    const msaPassed = average <= 3.0 &&
+      kernfaecherELevel >= 2 &&
+      (kernfaecherELevel + faecherELevel) >= 3;
 
     return {
-      status: 'Bestanden',
+      ebbrPassed: true,
+      msaPassed,
+      status: 'eBBR Bestanden',
       average,
-      uebergangGymnasialeOberstufe
+      uebergangGymnasialeOberstufe: uebergangResult.qualified,
+      uebergangReason: !uebergangResult.qualified ? uebergangResult.reason : undefined
     };
   }
 }

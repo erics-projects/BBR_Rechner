@@ -4,12 +4,12 @@ export class ExamCalculator {
   public static calculateExamGrades(examGrades: ExamGrades): string {
     const grades = Object.entries(examGrades).map(([subject, value]) => ({
       subject,
-      grade: parseInt(value.grade),
+      grade: value.grade ? parseInt(value.grade) : NaN,
       level: value.level
     }));
 
     // Check if all grades are filled
-    if (grades.some(g => isNaN(g.grade) || g.grade === 0)) {
+    if (grades.some(g => isNaN(g.grade))) {
       return '';
     }
 

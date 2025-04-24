@@ -25,27 +25,29 @@ export function ExamGradeInput({ examGrades, onInputChange, onLevelChange, onCal
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium flex items-center gap-2">
                   {displayNames[field as keyof ExamGrades]}
-                  <div className="flex items-center gap-1 ml-2">
-                    <input
-                      type="checkbox"
-                      checked={value.level === 'E'}
-                      onChange={onLevelChange(field as keyof ExamGrades)}
-                      className="form-checkbox h-4 w-4"
-                    />
-                    <span className="text-sm text-gray-600">E</span>
-                  </div>
+
                 </label>
               </div>
-              <input
-                type="number"
-                min="1"
-                max="6"
-                step="1"
-                value={value.grade}
-                onChange={onInputChange(field as keyof ExamGrades)}
-                className="border rounded p-2 dark:bg-gray-800"
-                placeholder="1-6"
-              />
+              <div className="flex gap-4 items-start">
+                <div className="w-3/4 sm:w-32">
+                  <input
+                    type="number"
+                    min="0"
+                    max="15"
+                    step="1"
+                    value={value.points}
+                    onChange={onInputChange(field as keyof ExamGrades)}
+                    className="w-full border rounded p-2 dark:bg-gray-800"
+                    placeholder="0-15"
+                  />
+                  <div className="text-xs text-gray-500 mt-1">Punkte (0-15)</div>
+                </div>
+                {value.points !== '' && (
+                  <div className="mt-2 text-lg">
+                    {value.grade}
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>

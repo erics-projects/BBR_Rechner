@@ -1,41 +1,44 @@
 'use client';
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GradeInput } from "./components/GradeInput";
 import { ResultsDisplay } from "./components/ResultsDisplay";
 import { ExamGradeInput } from "./components/ExamGradeInput";
 import { GradeCalculator } from "./services/gradeCalculator";
 import { ExamCalculator } from "./services/examCalculator";
-import { AllGradeInputs, GradeStats, ExamGrades, GradeWithLevel } from "./types/grades";
+import { AllGradeInputs, GradeStats, ExamGrades, GradeWithLevel, convertPointsToGrade, convertPointsToGradeG } from "./types/grades";
 
 export default function Home() {
   const [grades, setGrades] = useState<AllGradeInputs>({
     kernfaecher: {
-      deutsch: { grade: '', level: 'G' },
-      mathe: { grade: '', level: 'G' },
-      ersteFremdsprache: { grade: '', level: 'G' }
+      deutsch: { points: '', grade: '', level: 'G' },
+      mathe: { points: '', grade: '', level: 'G' },
+      ersteFremdsprache: { points: '', grade: '', level: 'G' }
     },
     faecher: {
-      biologie: { grade: '', level: 'G' },
-      physik: { grade: '', level: 'G' },
-      chemie: { grade: '', level: 'G' },
-      geographie: { grade: '', level: 'G' },
-      geschichte: { grade: '', level: 'G' },
-      politik: { grade: '', level: 'G' },
-      musik: { grade: '', level: 'G' },
-      kunst: { grade: '', level: 'G' },
-      sport: { grade: '', level: 'G' }
+      wAT: { points: '', grade: '', level: 'M' },
+      biologie: { points: '', grade: '', level: 'G' },
+      physik: { points: '', grade: '', level: 'G' },
+      chemie: { points: '', grade: '', level: 'G' },
+      ethik: { points: '', grade: '', level: 'M' },
+      geWi: { points: '', grade: '', level: 'M' },
+      musik: { points: '', grade: '', level: 'M' },
+      kunst: { points: '', grade: '', level: 'M' },
+      sport: { points: '', grade: '', level: 'M' },
+      französich: { points: '', grade: '', level: 'M' }
     }
   });
 
   const [examGrades, setExamGrades] = useState<ExamGrades>({
-    deutsch: { grade: '', level: 'G' },
-    mathematik: { grade: '', level: 'G' },
-    fremdsprache: { grade: '', level: 'G' },
-    praesentation: { grade: '', level: 'G' }
+    deutsch: { points: '', grade: '', level: 'G' },
+    mathematik: { points: '', grade: '', level: 'G' },
+    fremdsprache: { points: '', grade: '', level: 'G' },
+    praesentation: { points: '', grade: '', level: 'G' }
   });
 
   const [gradeStats, setGradeStats] = useState<GradeStats>({
+    ebbrPassed: false,
+    msaPassed: false,
     status: '',
     average: 0,
     uebergangGymnasialeOberstufe: false
@@ -45,12 +48,19 @@ export default function Home() {
 
   const handleInputChange = (category: 'kernfaecher' | 'faecher', subject: string) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
+      const points = e.target.value;
       setGrades(prev => {
+        const currentGrade = prev[category][subject as keyof typeof prev[typeof category]] as GradeWithLevel;
+        const grade = points ?
+          (currentGrade.level === 'G' ? convertPointsToGradeG(Number(points)) : convertPointsToGrade(Number(points))).toString()
+          : '';
+        
         const updatedCategory = {
           ...prev[category],
           [subject]: {
             ...(prev[category][subject as keyof typeof prev[typeof category]] as GradeWithLevel),
-            grade: e.target.value
+            points,
+            grade
           }
         };
         return {
@@ -63,10 +73,15 @@ export default function Home() {
   const handleLevelChange = (category: 'kernfaecher' | 'faecher', subject: string) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setGrades(prev => {
+        const currentGrade = prev[category][subject as keyof typeof prev[typeof category]] as GradeWithLevel;
+        
+        // Don't allow changing M-level grades
+        if (currentGrade.level === 'M') return prev;
+
         const updatedCategory = {
           ...prev[category],
           [subject]: {
-            ...(prev[category][subject as keyof typeof prev[typeof category]] as GradeWithLevel),
+            ...currentGrade,
             level: e.target.checked ? 'E' : 'G'
           }
         };
@@ -79,11 +94,15 @@ export default function Home() {
 
   const handleExamInputChange = (field: keyof ExamGrades) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
+      const points = e.target.value;
+      const grade = points ? convertPointsToGrade(Number(points)).toString() : '';
+      
       setExamGrades(prev => ({
         ...prev,
         [field]: {
           ...prev[field],
-          grade: e.target.value
+          points,
+          grade
         }
       }));
     };
@@ -122,7 +141,7 @@ export default function Home() {
             priority
           />
           <h1 className="text-4xl font-bold text-gray-800 dark:text-white">
-            Abschlussnotenrechner
+            Abschlussrechner
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400">
             erweiterte Berufsbildungsreife (eBBR) Notenrechner für Berlin
