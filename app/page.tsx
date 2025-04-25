@@ -133,11 +133,11 @@ export default function Home() {
       <main className="flex flex-col gap-[32px] row-start-2 items-center">
         <div className="text-center mb-8 flex flex-col items-center gap-6">
           <Image
-            src="/elouco_logo.png"
-            alt="Elouco logo"
-            width={64}
-            height={64}
-            className="w-16 h-16"
+            src="/elui_logo_schwarz.png"
+            alt="Elui logo"
+            width={200}
+            height={200}
+            className="w-3/5 sm:w-32 h-auto"
             priority
           />
           <h1 className="text-4xl font-bold text-gray-800 dark:text-white">

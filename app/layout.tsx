@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "Abschlussrechner",
   description: "eBBR, BBR und MSA Notenrechner für Berlin",
   icons: [
-    { rel: 'icon', url: '/elouco_logo_plain.png' }
+    { rel: 'icon', url: '/elui_logo_schwarz.png' }
   ]
 };
 
