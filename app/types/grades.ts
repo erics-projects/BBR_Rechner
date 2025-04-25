@@ -54,8 +54,11 @@ export interface ExamGrades {
 
 export interface GradeStats {
   ebbrPassed: boolean;
+  ebbrStatus: string;
   msaPassed: boolean;
-  status: string;
+  msaStatus: string;
+  bbrPassed: boolean;
+  bbrStatus: string;
   average: number;
   uebergangGymnasialeOberstufe: boolean;
   uebergangReason?: string;

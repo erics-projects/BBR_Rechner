@@ -38,10 +38,14 @@ export default function Home() {
 
   const [gradeStats, setGradeStats] = useState<GradeStats>({
     ebbrPassed: false,
+    ebbrStatus: '',
     msaPassed: false,
-    status: '',
+    msaStatus: '',
+    bbrPassed: false,
+    bbrStatus: '',
     average: 0,
-    uebergangGymnasialeOberstufe: false
+    uebergangGymnasialeOberstufe: false,
+    uebergangReason: undefined
   });
 
   const [examResult, setExamResult] = useState('');

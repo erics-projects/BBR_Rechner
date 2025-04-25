@@ -52,7 +52,7 @@ export function GradeInput({ grades, onInputChange, onLevelChange }: GradeInputP
                 </label>
               </div>
               <div className="flex gap-4 items-start">
-                <div className="w-3/4 sm:w-32">
+                <div className="w-3/4 sm:w-40">
                   <input
                     type="number"
                     min="0"
@@ -100,7 +100,7 @@ export function GradeInput({ grades, onInputChange, onLevelChange }: GradeInputP
                 </label>
               </div>
               <div className="flex gap-4 items-start">
-                <div className="w-3/4 sm:w-32">
+                <div className="w-3/4 sm:w-40">
                   <input
                     type="number"
                     min="0"

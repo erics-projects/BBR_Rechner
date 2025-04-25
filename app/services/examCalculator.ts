@@ -39,7 +39,7 @@ export class ExamCalculator {
       }
     }
 
-    return 'eBBR bestanden';
+    return 'eBBR und MSA Prüfungen bestanden';
   }
 
   private static getSubjectDisplayName(subject: string): string {

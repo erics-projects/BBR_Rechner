@@ -5,42 +5,32 @@ interface ResultsDisplayProps {
 }
 
 export function ResultsDisplay({ gradeStats }: ResultsDisplayProps) {
-  if (!gradeStats.status && !gradeStats.ebbrPassed) {
+  // Only render if we have grades to display
+  if (!gradeStats.average) {
     return null;
   }
 
   return (
     <div className="bg-transparent text-white font-medium flex flex-col gap-3">
-      <div className={gradeStats.ebbrPassed ? 'text-green-400' : 'text-red-400'}>
-        eBBR: {gradeStats.ebbrPassed ? 'Bestanden' : 'Nicht bestanden'}
-      </div>
-
-      <div className="text-foreground">
+      <div className={`text-xl font-bold ${gradeStats.average > 4.2 ? 'text-red-400' : 'text-green-400'}`}>
         Durchschnitt: {gradeStats.average}
       </div>
 
-      {gradeStats.ebbrPassed && (
-        <>
-          <div className={gradeStats.msaPassed ? 'text-green-400' : 'text-yellow-400'}>
-            MSA: {gradeStats.msaPassed ? 'Bestanden' : 'Nicht bestanden'}
-          </div>
+      <div className={gradeStats.bbrPassed ? 'text-green-400' : 'text-red-400'}>
+        {gradeStats.bbrStatus}
+      </div>
 
-          <div className={gradeStats.uebergangGymnasialeOberstufe ? 'text-green-400' : 'text-yellow-400'}>
-            Übergang Gymnasiale Oberstufe: {gradeStats.uebergangGymnasialeOberstufe ? 'Ja' : 'Nein'}
-            {!gradeStats.uebergangGymnasialeOberstufe && gradeStats.uebergangReason && (
-              <div className="text-sm text-gray-400 mt-1">
-                Grund: {gradeStats.uebergangReason}
-              </div>
-            )}
-          </div>
-        </>
-      )}
+      <div className={gradeStats.ebbrPassed ? 'text-green-400' : 'text-red-400'}>
+        {gradeStats.ebbrStatus}
+      </div>
 
-      {!gradeStats.ebbrPassed && gradeStats.status && (
-        <div className="text-sm text-red-400 mt-2">
-          {gradeStats.status}
-        </div>
-      )}
+      <div className={gradeStats.msaPassed ? 'text-green-400' : 'text-yellow-400'}>
+        {gradeStats.msaStatus}
+      </div>
+
+      <div className={gradeStats.uebergangGymnasialeOberstufe ? 'text-green-400' : 'text-yellow-400'}>
+        {gradeStats.uebergangReason}
+      </div>
     </div>
   );
 }

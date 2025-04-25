@@ -78,8 +78,11 @@ export class GradeCalculator {
     if (gradeCount === 0) {
       return {
         ebbrPassed: false,
+        ebbrStatus: 'Keine Noten eingegeben',
         msaPassed: false,
-        status: '',
+        msaStatus: 'Keine Noten eingegeben',
+        bbrPassed: false,
+        bbrStatus: 'Keine Noten eingegeben',
         average: 0,
         uebergangGymnasialeOberstufe: false,
         uebergangReason: undefined
@@ -89,6 +92,34 @@ export class GradeCalculator {
     // Calculate average
     const average = Number((allGrades.reduce((a, b) => a + b, 0) / gradeCount).toFixed(1));
 
+    // Check BBR conditions
+    const deutschGrade = parseInt(grades.kernfaecher.deutsch.grade);
+    const matheGrade = parseInt(grades.kernfaecher.mathe.grade);
+    
+    // Determine BBR status and reason
+    let bbrPassed = false;
+    let bbrStatus = '';
+  
+    if ( isNaN(deutschGrade) || isNaN(matheGrade)) {
+      bbrPassed = false;
+      bbrStatus = 'BBR: Nicht bestanden, weil Deutsch oder Mathematik nicht belegt wurde.';
+    }else if (average > 4.2) {
+      bbrPassed = false;
+      bbrStatus = `BBR: Nicht bestanden, weil der Notendurchschnitt ${average} über 4,2 ist.`;
+    } else if (deutschGrade === 6) {
+      bbrPassed = false;
+      bbrStatus = 'BBR: Nicht bestanden, weil Deutsch mit Note 6 bewertet wurde.';
+    } else if (matheGrade === 6) {
+      bbrPassed = false;
+      bbrStatus = 'BBR: Nicht bestanden, weil Mathematik mit Note 6 bewertet wurde.';
+    } else if ((deutschGrade + matheGrade) > 9) {
+      bbrPassed = false;
+      bbrStatus = `BBR: Nicht bestanden, weil die Noten in Deutsch und Mathematik beide schlechter als 4 sind.`;
+    } else {
+      bbrPassed = true;
+      bbrStatus = 'BBR: Bestanden';
+    }
+
     // Check for failing conditions
     const hasSixInKernfaecher = kernfaecherGrades.includes(6);
     const hasMultipleFiveInKernfaecher = kernfaecherGrades.filter(g => g === 5).length > 1;
@@ -97,8 +128,11 @@ export class GradeCalculator {
     if (hasSixInKernfaecher || hasMultipleFiveInKernfaecher) {
       return {
         ebbrPassed: false,
+        ebbrStatus: 'eBBR: Nicht bestanden wegen 6 oder 2x5 in einem Kernfach',
         msaPassed: false,
-        status: 'Nicht bestanden: 6 oder 2x5 in einem Kernfach.',
+        msaStatus: 'MSA: Nicht bestanden',
+        bbrPassed: false,
+        bbrStatus: bbrStatus,
         average,
         uebergangGymnasialeOberstufe: false,
         uebergangReason: 'Note 6 oder 2x5 in Kernfächern'
@@ -108,8 +142,11 @@ export class GradeCalculator {
     if (hasMultipleSixInFaecher) {
       return {
         ebbrPassed: false,
+        ebbrStatus: 'eBBR: Nicht bestanden wegen 2x 6 in Fächer',
         msaPassed: false,
-        status: 'Nicht bestanden: 2x 6 in Fächer.',
+        msaStatus: 'MSA: Nicht bestanden',
+        bbrPassed: false,
+        bbrStatus: bbrStatus,
         average,
         uebergangGymnasialeOberstufe: false,
         uebergangReason: '2x Note 6 in Fächern'
@@ -125,8 +162,11 @@ export class GradeCalculator {
     if (singleSixInFaecher && gradesTwoOrBetter < 2) {
       return {
         ebbrPassed: false,
+        ebbrStatus: 'eBBR: Nicht bestanden wegen 1x 6 in Fächer ohne ausgleichende Noten',
         msaPassed: false,
-        status: 'Nicht bestanden: 1x 6 in Fächer und keine 2 zweien in Kernfächer und/oder Fächer.',
+        msaStatus: 'MSA: Nicht bestanden',
+        bbrPassed: false,
+        bbrStatus: bbrStatus,
         average,
         uebergangGymnasialeOberstufe: false,
         uebergangReason: 'Note 6 in Fächern ohne ausgleichende Noten'
@@ -140,8 +180,11 @@ export class GradeCalculator {
     if (fivesInFaecher >= 2 && gradesThreeOrBetter < 2) {
       return {
         ebbrPassed: false,
+        ebbrStatus: 'eBBR: Nicht bestanden wegen 2x 5 in Fächer ohne ausreichende Noten',
         msaPassed: false,
-        status: 'Nicht bestanden: 2x 5 in Fächer und nicht genug 3er.',
+        msaStatus: 'MSA: Nicht bestanden',
+        bbrPassed: false,
+        bbrStatus: bbrStatus,
         average,
         uebergangGymnasialeOberstufe: false,
         uebergangReason: '2x Note 5 in Fächern ohne ausreichend gute Noten'
@@ -151,8 +194,11 @@ export class GradeCalculator {
     if (fivesInKernfaecher >= 1 && fivesInFaecher >= 1 && gradesThreeOrBetter < 2) {
       return {
         ebbrPassed: false,
+        ebbrStatus: 'eBBR: Nicht bestanden wegen 1x 5 in Kernfach und 1x 5 in Fächer ohne ausreichende Noten',
         msaPassed: false,
-        status: 'Nicht bestanden: 1x 5 in Kernfächer und 1x 5 in Fächer und nicht genug 3er.',
+        msaStatus: 'MSA: Nicht bestanden',
+        bbrPassed: false,
+        bbrStatus: bbrStatus,
         average,
         uebergangGymnasialeOberstufe: false,
         uebergangReason: 'Note 5 in Kernfach und Fach ohne ausreichend gute Noten'
@@ -165,18 +211,38 @@ export class GradeCalculator {
     // Check MSA and Übergang Gymnasiale Oberstufe
     const uebergangResult = this.checkUebergangGymnasialeOberstufe(grades, average);
 
-    // Check MSA (similar to Übergang requirements but with different thresholds)
-    const msaPassed = average <= 3.0 &&
-      kernfaecherELevel >= 2 &&
-      (kernfaecherELevel + faecherELevel) >= 3;
+    // Check MSA with detailed reason
+    let msaPassed = false;
+    let msaStatus = '';
+    if (average > 3.0) {
+      msaPassed = false;
+      msaStatus = `MSA: Nicht bestanden, Notendurchschnitt ${average} ist über 3,0`;
+    } else if (kernfaecherELevel < 2) {
+      msaPassed = false;
+      msaStatus = 'MSA: Nicht bestanden, weniger als 2 E-Kurse in Kernfächern mit Note 3 oder besser';
+    } else if ((kernfaecherELevel + faecherELevel) < 3) {
+      msaPassed = false;
+      msaStatus = 'MSA: Nicht bestanden, weniger als 3 E-Kurse insgesamt mit Note 3 oder besser';
+    } else {
+      msaPassed = true;
+      msaStatus = 'MSA: Bestanden';
+    }
+
+    // Update Übergang status to include reason in success message
+    const uebergangStatus = uebergangResult.qualified
+      ? 'Übergang Gymnasiale Oberstufe: Ja'
+      : `Übergang Gymnasiale Oberstufe: Nein, ${uebergangResult.reason}`;
 
     return {
       ebbrPassed: true,
+      ebbrStatus: 'eBBR: Bestanden',
       msaPassed,
-      status: 'eBBR Bestanden',
+      msaStatus,
+      bbrPassed,
+      bbrStatus,
       average,
       uebergangGymnasialeOberstufe: uebergangResult.qualified,
-      uebergangReason: !uebergangResult.qualified ? uebergangResult.reason : undefined
+      uebergangReason: uebergangStatus
     };
   }
 }
