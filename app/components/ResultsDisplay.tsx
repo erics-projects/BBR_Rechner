@@ -24,11 +24,11 @@ export function ResultsDisplay({ gradeStats }: ResultsDisplayProps) {
         {gradeStats.ebbrStatus}
       </div>
 
-      <div className={gradeStats.msaPassed ? 'text-green-400' : 'text-yellow-400'}>
+      <div className={gradeStats.msaPassed ? 'text-green-400' : 'text-red-400'}>
         {gradeStats.msaStatus}
       </div>
 
-      <div className={gradeStats.uebergangGymnasialeOberstufe ? 'text-green-400' : 'text-yellow-400'}>
+      <div className={gradeStats.uebergangGymnasialeOberstufe ? 'text-green-400' : 'text-red-400'}>
         {gradeStats.uebergangReason}
       </div>
     </div>

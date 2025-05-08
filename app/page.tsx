@@ -82,11 +82,18 @@ export default function Home() {
         // Don't allow changing M-level grades
         if (currentGrade.level === 'M') return prev;
 
+        const newLevel = e.target.checked ? 'E' : 'G';
+        // Recalculate grade based on new level if points exist
+        const grade = currentGrade.points ?
+          (newLevel === 'G' ? convertPointsToGradeG(Number(currentGrade.points)) : convertPointsToGrade(Number(currentGrade.points))).toString()
+          : currentGrade.grade;
+
         const updatedCategory = {
           ...prev[category],
           [subject]: {
             ...currentGrade,
-            level: e.target.checked ? 'E' : 'G'
+            level: newLevel,
+            grade
           }
         };
         return {
@@ -136,19 +143,11 @@ export default function Home() {
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
       <main className="flex flex-col gap-[32px] row-start-2 items-center">
         <div className="text-center mb-8 flex flex-col items-center gap-6">
-          <Image
-            src="/elui_logo_schwarz.png"
-            alt="Elui logo"
-            width={200}
-            height={200}
-            className="w-3/5 sm:w-32 h-auto"
-            priority
-          />
           <h1 className="text-4xl font-bold text-gray-800 dark:text-white">
             Abschlussrechner
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400">
-            erweiterte Berufsbildungsreife (eBBR) Notenrechner für Berlin
+            erweiterte Berufsbildungsreife (eBBR) und MSA Notenrechner für Berlin
           </p>
     
           <a
