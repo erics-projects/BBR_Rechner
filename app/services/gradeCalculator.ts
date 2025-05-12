@@ -153,13 +153,42 @@ export class GradeCalculator {
       };
     }
 
-    // Count grades that are 2 or better and 3 or better
-    const gradesThreeOrBetter = allGrades.filter(g => g <= 3).length;
-    const gradesTwoOrBetter = allGrades.filter(g => g <= 2).length;
+    // Count grades that are 2 or better and 3 or better 
+    // only kernfaecher
+    let gradesTwoOrBetterKF = kernfaecherGrades.filter(g => g <= 2).length;
+    let gradesThreeOrBetterKF = kernfaecherGrades.filter(g => g <= 3).length;
+    // only faecher
+    let gradesTwoOrBetterF = faecherGrades.filter(g => g <= 2).length;
+    let gradesThreeOrBetterF = faecherGrades.filter(g => g <= 3).length;
+    // both
+    let gradesThreeOrBetter = allGrades.filter(g => g <= 3).length;
+    let gradesTwoOrBetter = allGrades.filter(g => g <= 2).length;
 
     // Handle single 6 in Fächer
     const singleSixInFaecher = faecherGrades.filter(g => g === 6).length === 1;
-    if (singleSixInFaecher && gradesTwoOrBetter < 2) {
+    if (singleSixInFaecher) {
+
+      if (gradesTwoOrBetter >= 2) {
+        gradesTwoOrBetter -= 2;
+        gradesThreeOrBetter -= 2;
+
+        if (gradesTwoOrBetterF >= 2) {
+          gradesThreeOrBetterF -= 2;
+          gradesTwoOrBetterF -= 2;
+          
+        } else if (gradesTwoOrBetterF === 1 && gradesTwoOrBetterKF >= 1) {
+          gradesThreeOrBetterF -= 1;
+          gradesThreeOrBetterKF -= 1;
+          gradesTwoOrBetterF -= 1;
+          gradesTwoOrBetterKF -= 1;
+        } else if (gradesTwoOrBetterKF >= 2) {
+          gradesThreeOrBetterKF -= 2;
+          gradesTwoOrBetterKF -= 2;
+        }
+    
+      } 
+      else {
+
       return {
         ebbrPassed: false,
         ebbrStatus: 'eBBR: Nicht bestanden wegen 1x 6 in Fächer ohne ausgleichende Noten',
@@ -171,39 +200,111 @@ export class GradeCalculator {
         uebergangGymnasialeOberstufe: false,
         uebergangReason: 'Note 6 in Fächern ohne ausgleichende Noten'
       };
+    } 
     }
 
     // Handle 5s
-    const fivesInFaecher = faecherGrades.filter(g => g === 5).length;
-    const fivesInKernfaecher = kernfaecherGrades.filter(g => g === 5).length;
-
-    if (fivesInFaecher >= 2 && gradesThreeOrBetter < 2) {
+    let fivesInFaecher = faecherGrades.filter(g => g === 5).length;
+    let fivesInKernfaecher = kernfaecherGrades.filter(g => g === 5).length;
+    const allFives = fivesInFaecher + fivesInKernfaecher;
+    if (singleSixInFaecher && allFives > 3) {
       return {
         ebbrPassed: false,
-        ebbrStatus: 'eBBR: Nicht bestanden wegen 2x 5 in Fächer ohne ausreichende Noten',
+        ebbrStatus: 'eBBR: Nicht bestanden wegen 1x 6 in Fächer und mehr als 4 x 5 - zu viele Durchfallkriterien überschritten',
         msaPassed: false,
-        msaStatus: 'MSA: Nicht bestanden',
+        msaStatus: 'MSA: Nicht bestanden wegen 1x 6 in Fächer und mehr als 4 x 5 - zu viele Durchfallkriterien überschritten',
         bbrPassed: false,
         bbrStatus: bbrStatus,
         average,
         uebergangGymnasialeOberstufe: false,
-        uebergangReason: '2x Note 5 in Fächern ohne ausreichend gute Noten'
-      };
-    }
+        uebergangReason: 'Nicht bestanden wegen 1x 6 in Fächer und mehr als 4 x 5 - zu viele Durchfallkriterien überschritten'
+      }
+    };
+    if (allFives > 5) {
+      return {
+        ebbrPassed: false,
+        ebbrStatus: 'eBBR: Nicht bestanden, mehr als 5 x 5 - zu viele Durchfallkriterien überschritten',
+        msaPassed: false,
+        msaStatus: 'MSA: Nicht bestanden, mehr als 5 x 5 - zu viele Durchfallkriterien überschritten',
+        bbrPassed: false,
+        bbrStatus: bbrStatus,
+        average,
+        uebergangGymnasialeOberstufe: false,
+        uebergangReason: 'Mehr als 5 x 5 - zu viele Durchfallkriterien überschritten'
+      }
+    };
+    if (fivesInKernfaecher ==1 && fivesInFaecher >= 5) {
+      return {
+        ebbrPassed: false,
+        ebbrStatus: 'eBBR: Nicht bestanden, mehr als 1x5 in Kernfach und als 4 x 5 in Fächer- zu viele Durchfallkriterien überschritten',
+        msaPassed: false,
+        msaStatus: 'MSA: Nicht bestanden, mehr als 1x5 in Kernfach und als 4 x 5 in Fächer- zu viele Durchfallkriterien überschritten',
+        bbrPassed: false,
+        bbrStatus: bbrStatus,
+        average,
+        uebergangGymnasialeOberstufe: false,
+        uebergangReason: 'Mehr als 1x5 in Kernfach und als 4 x 5 in Fächer- zu viele Durchfallkriterien überschritten'
+      }
+    };
 
-    if (fivesInKernfaecher >= 1 && fivesInFaecher >= 1 && gradesThreeOrBetter < 2) {
+    if (fivesInKernfaecher >= 1 && fivesInFaecher >= 1 ) {
+      console.log('Fives in Kernfächer and Fächer:');
+      
+        if (gradesThreeOrBetterKF > 1 || (gradesThreeOrBetterKF === 1 && gradesThreeOrBetterF >= 1)) {
+          console.log('Fives in Kernfächer and Fächer: 1x 5 in Kernfächer and 1x 5 in Fächer');
+          gradesThreeOrBetterKF -= 1;
+          gradesThreeOrBetter -= 1;
+          fivesInKernfaecher -= 1;
+  
+          if (gradesThreeOrBetterF >= 1) {
+            console.log('Fives in Fächer: 1x 5 in Fächer');
+            gradesThreeOrBetterF -= 1;
+            gradesThreeOrBetter -= 1;
+            fivesInFaecher -= 1;
+          } else if (gradesThreeOrBetterKF > 1) {
+            console.log('Fives in Kernfächer: 1x 5 in Kernfächer');
+            gradesThreeOrBetterKF -= 1;
+            gradesThreeOrBetter -= 1;
+            fivesInKernfaecher -= 1;
+          }
+        } else {
       return {
         ebbrPassed: false,
         ebbrStatus: 'eBBR: Nicht bestanden wegen 1x 5 in Kernfach und 1x 5 in Fächer ohne ausreichende Noten',
         msaPassed: false,
-        msaStatus: 'MSA: Nicht bestanden',
+        msaStatus: 'MSA: Nicht bestanden wegen 1x 5 in Kernfach und 1x 5 in Fächer ohne ausreichende Noten',
         bbrPassed: false,
         bbrStatus: bbrStatus,
         average,
         uebergangGymnasialeOberstufe: false,
-        uebergangReason: 'Note 5 in Kernfach und Fach ohne ausreichend gute Noten'
+        uebergangReason: 'Nicht bestanden wegen 1x 5 in Kernfach und 1x 5 in Fächer ohne ausreichende Noten'
       };
     }
+  }
+
+    if (fivesInFaecher >= 2) {
+        if (gradesThreeOrBetter >= 2) {
+          fivesInFaecher -= 2;
+          gradesThreeOrBetter -= 2;
+          gradesThreeOrBetterF -= 2;
+    
+        } else {
+          return {
+          ebbrPassed: false,
+          ebbrStatus: 'eBBR: Nicht bestanden wegen 2x 5 in Fächer ohne ausreichende Noten',
+          msaPassed: false,
+          msaStatus: 'MSA: Nicht bestanden wegen 2x 5 in Fächer ohne ausreichende Noten',
+          bbrPassed: false,
+          bbrStatus: bbrStatus,
+          average,
+          uebergangGymnasialeOberstufe: false,
+          uebergangReason: '2x Note 5 in Fächern ohne ausreichend gute Noten'
+      };
+    }
+  }
+  
+
+    
 
     // Count E-Level grades for MSA and Übergang checks
     const { kernfaecherELevel, faecherELevel } = this.countELevelGrades(grades);
