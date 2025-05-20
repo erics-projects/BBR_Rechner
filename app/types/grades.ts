@@ -1,6 +1,7 @@
 export interface GradeWithLevel {
   points: string;
-  grade: string;
+  gradeE: string;
+  gradeG: string;
   level: 'E' | 'G' | 'M';
 }
 
@@ -59,7 +60,8 @@ export interface GradeStats {
   msaStatus: string;
   bbrPassed: boolean;
   bbrStatus: string;
-  average: number;
+  averageG: number;  // For BBR/eBBR calculations
+  averageE: number;  // For MSA/Übergang calculations
   uebergangGymnasialeOberstufe: boolean;
   uebergangReason?: string;
 }

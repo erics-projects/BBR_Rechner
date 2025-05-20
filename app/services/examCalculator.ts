@@ -4,7 +4,9 @@ export class ExamCalculator {
   public static calculateExamGrades(examGrades: ExamGrades): string {
     const grades = Object.entries(examGrades).map(([subject, value]) => ({
       subject,
-      grade: value.grade ? parseInt(value.grade) : NaN,
+      grade: value.level === 'E'
+        ? (value.gradeE ? parseInt(value.gradeE) : NaN)
+        : (value.gradeG ? parseInt(value.gradeG) : NaN),
       level: value.level
     }));
 
