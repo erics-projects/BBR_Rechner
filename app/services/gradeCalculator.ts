@@ -6,11 +6,11 @@ export class GradeCalculator {
     faecherELevel: number;
   } {
     const kernfaecherELevel = Object.values(grades.kernfaecher)
-      .filter(g => g.level === 'E' && g.grade !== '' && parseInt(g.grade) <= 3)
+      .filter(g => g.level === 'E' && g.gradeE && parseInt(g.gradeE) <= 3)
       .length;
     
     const faecherELevel = Object.values(grades.faecher)
-      .filter(g => g.level === 'E' && g.grade !== '' && parseInt(g.grade) <= 3)
+      .filter(g => g.level === 'E' && g.gradeE && parseInt(g.gradeE) <= 3)
       .length;
 
     return { kernfaecherELevel, faecherELevel };
@@ -18,12 +18,12 @@ export class GradeCalculator {
 
   private static checkUebergangGymnasialeOberstufe(
     grades: AllGradeInputs,
-    average: number
+    averageE: number
   ): { qualified: boolean; reason?: string } {
-    if (average > 3.0) {
+    if (averageE > 3.0) {
       return {
         qualified: false,
-        reason: `Notendurchschnitt ${average} ist schlechter als 3,0`
+        reason: `Notendurchschnitt ${averageE} ist schlechter als 3,0`
       };
     }
 
@@ -32,7 +32,9 @@ export class GradeCalculator {
       ...Object.values(grades.kernfaecher),
       ...Object.values(grades.faecher)
     ];
-    if (allGrades.some(g => g.grade !== '' && parseInt(g.grade) > 4)) {
+    // For Übergang, we only check E-level grades
+    const eGrades = allGrades.filter(g => g.level === 'E');
+    if (eGrades.some(g => g.gradeE && parseInt(g.gradeE) > 4)) {
       return {
         qualified: false,
         reason: 'Alle Noten müssen 4 oder besser sein'
@@ -49,27 +51,33 @@ export class GradeCalculator {
       };
     }
 
-    // Need at least 3 E-Level grades in total with grade 3 or better
+    // Need at least 2 E-Level grades in total with grade 3 or better
     const totalELevel = kernfaecherELevel + faecherELevel;
-    if (totalELevel < 3) {
+    if (totalELevel < 2) {
       return {
         qualified: false,
-        reason: 'Insgesamt mindestens 3 E-Kurse mit Note 3 oder besser benötigt'
+        reason: 'Insgesamt mindestens 2 E-Kurse mit Note 3 oder besser benötigt'
       };
     }
 
     return { qualified: true };
   }
 
-  public static calculateGrades(grades: AllGradeInputs): GradeStats {
-    // Get all numeric grades
+  private static calculateBBRGrades(grades: AllGradeInputs): {
+    bbrPassed: boolean;
+    bbrStatus: string;
+    ebbrPassed: boolean;
+    ebbrStatus: string;
+    averageG: number;
+  } {
+    // Always use gradeG for BBR/eBBR calculations
     const kernfaecherGrades = Object.values(grades.kernfaecher)
       .filter(g => g.points !== '')
-      .map(g => parseInt(g.grade));
+      .map(g => g.level === 'E' ? parseInt(g.gradeE) : parseInt(g.gradeG));
 
     const faecherGrades = Object.values(grades.faecher)
       .filter(g => g.points !== '')
-      .map(g => parseInt(g.grade));
+      .map(g => g.level === 'E' ? parseInt(g.gradeE) : parseInt(g.gradeG));
 
     // Count grades
     const allGrades = [...kernfaecherGrades, ...faecherGrades];
@@ -77,36 +85,46 @@ export class GradeCalculator {
 
     if (gradeCount === 0) {
       return {
-        ebbrPassed: false,
-        ebbrStatus: 'Keine Noten eingegeben',
-        msaPassed: false,
-        msaStatus: 'Keine Noten eingegeben',
         bbrPassed: false,
         bbrStatus: 'Keine Noten eingegeben',
-        average: 0,
-        uebergangGymnasialeOberstufe: false,
-        uebergangReason: undefined
+        ebbrPassed: false,
+        ebbrStatus: 'Keine Noten eingegeben',
+        averageG: 0
       };
     }
 
-    // Calculate average
-    const average = Number((allGrades.reduce((a, b) => a + b, 0) / gradeCount).toFixed(1));
+    // Calculate G average
+    const averageG = Number((allGrades.reduce((a, b) => a + b, 0) / gradeCount).toFixed(1));
 
-    // Check BBR conditions
-    const deutschGrade = parseInt(grades.kernfaecher.deutsch.grade);
-    const matheGrade = parseInt(grades.kernfaecher.mathe.grade);
+    // Check BBR conditions using gradeG
+    const deutschGrade = parseInt(grades.kernfaecher.deutsch.gradeG);
+    const matheGrade = parseInt(grades.kernfaecher.mathe.gradeG);
     
     // Determine BBR status and reason
     let bbrPassed = false;
     let bbrStatus = '';
   
-    if ( isNaN(deutschGrade) || isNaN(matheGrade)) {
-      bbrPassed = false;
-      bbrStatus = 'BBR: Nicht bestanden, weil Deutsch oder Mathematik nicht belegt wurde.';
-    }else if (average > 4.2) {
-      bbrPassed = false;
-      bbrStatus = `BBR: Nicht bestanden, weil der Notendurchschnitt ${average} über 4,2 ist.`;
-    } else if (deutschGrade === 6) {
+    if (isNaN(deutschGrade) || isNaN(matheGrade)) {
+      return {
+        bbrPassed: false,
+        bbrStatus: 'BBR: Nicht bestanden, weil Deutsch oder Mathematik nicht belegt wurde.',
+        ebbrPassed: false,
+        ebbrStatus: 'eBBR: Nicht bestanden, weil Deutsch oder Mathematik nicht belegt wurde.',
+        averageG: 0
+      };
+    }
+
+    if (averageG > 4.2) {
+      return {
+        bbrPassed: false,
+        bbrStatus: `BBR: Nicht bestanden, weil der Notendurchschnitt ${averageG} über 4,2 ist.`,
+        ebbrPassed: false,
+        ebbrStatus: `eBBR: Nicht bestanden, weil der Notendurchschnitt ${averageG} über 4,2 ist.`,
+        averageG
+      };
+    }
+
+    if (deutschGrade === 6) {
       bbrPassed = false;
       bbrStatus = 'BBR: Nicht bestanden, weil Deutsch mit Note 6 bewertet wurde.';
     } else if (matheGrade === 6) {
@@ -125,31 +143,24 @@ export class GradeCalculator {
     const hasMultipleFiveInKernfaecher = kernfaecherGrades.filter(g => g === 5).length > 1;
     const hasMultipleSixInFaecher = faecherGrades.filter(g => g === 6).length > 1;
 
+    // Early exit conditions for BBR/eBBR
     if (hasSixInKernfaecher || hasMultipleFiveInKernfaecher) {
       return {
+        bbrPassed: false,
+        bbrStatus: 'BBR: Nicht bestanden wegen 6 oder 2x5 in einem Kernfach',
         ebbrPassed: false,
         ebbrStatus: 'eBBR: Nicht bestanden wegen 6 oder 2x5 in einem Kernfach',
-        msaPassed: false,
-        msaStatus: 'MSA: Nicht bestanden',
-        bbrPassed: false,
-        bbrStatus: bbrStatus,
-        average,
-        uebergangGymnasialeOberstufe: false,
-        uebergangReason: 'Note 6 oder 2x5 in Kernfächern'
+        averageG
       };
     }
 
     if (hasMultipleSixInFaecher) {
       return {
+        bbrPassed: false,
+        bbrStatus: 'BBR: Nicht bestanden wegen 2x 6 in Fächer',
         ebbrPassed: false,
         ebbrStatus: 'eBBR: Nicht bestanden wegen 2x 6 in Fächer',
-        msaPassed: false,
-        msaStatus: 'MSA: Nicht bestanden',
-        bbrPassed: false,
-        bbrStatus: bbrStatus,
-        average,
-        uebergangGymnasialeOberstufe: false,
-        uebergangReason: '2x Note 6 in Fächern'
+        averageG
       };
     }
 
@@ -190,15 +201,11 @@ export class GradeCalculator {
       else {
 
       return {
+        bbrPassed: false,
+        bbrStatus: 'BBR: Nicht bestanden wegen 1x 6 in Fächer ohne ausgleichende Noten',
         ebbrPassed: false,
         ebbrStatus: 'eBBR: Nicht bestanden wegen 1x 6 in Fächer ohne ausgleichende Noten',
-        msaPassed: false,
-        msaStatus: 'MSA: Nicht bestanden',
-        bbrPassed: false,
-        bbrStatus: bbrStatus,
-        average,
-        uebergangGymnasialeOberstufe: false,
-        uebergangReason: 'Note 6 in Fächern ohne ausgleichende Noten'
+        averageG
       };
     } 
     }
@@ -209,43 +216,31 @@ export class GradeCalculator {
     const allFives = fivesInFaecher + fivesInKernfaecher;
     if (singleSixInFaecher && allFives > 3) {
       return {
-        ebbrPassed: false,
-        ebbrStatus: 'eBBR: Nicht bestanden wegen 1x 6 in Fächer und mehr als 4 x 5 - zu viele Durchfallkriterien überschritten',
-        msaPassed: false,
-        msaStatus: 'MSA: Nicht bestanden wegen 1x 6 in Fächer und mehr als 4 x 5 - zu viele Durchfallkriterien überschritten',
         bbrPassed: false,
-        bbrStatus: bbrStatus,
-        average,
-        uebergangGymnasialeOberstufe: false,
-        uebergangReason: 'Nicht bestanden wegen 1x 6 in Fächer und mehr als 4 x 5 - zu viele Durchfallkriterien überschritten'
+        bbrStatus: 'BBR: Nicht bestanden wegen zu vielen Durchfallkriterien',
+        ebbrPassed: false,
+        ebbrStatus: 'eBBR: Nicht bestanden wegen 1x 6 und mehr als 4 x 5',
+        averageG
       }
-    };
+    }
     if (allFives > 5) {
       return {
-        ebbrPassed: false,
-        ebbrStatus: 'eBBR: Nicht bestanden, mehr als 5 x 5 - zu viele Durchfallkriterien überschritten',
-        msaPassed: false,
-        msaStatus: 'MSA: Nicht bestanden, mehr als 5 x 5 - zu viele Durchfallkriterien überschritten',
         bbrPassed: false,
-        bbrStatus: bbrStatus,
-        average,
-        uebergangGymnasialeOberstufe: false,
-        uebergangReason: 'Mehr als 5 x 5 - zu viele Durchfallkriterien überschritten'
+        bbrStatus: 'BBR: Nicht bestanden, mehr als 5 x 5',
+        ebbrPassed: false,
+        ebbrStatus: 'eBBR: Nicht bestanden, mehr als 5 x 5',
+        averageG
       }
-    };
-    if (fivesInKernfaecher ==1 && fivesInFaecher >= 5) {
+    }
+    if (fivesInKernfaecher == 1 && fivesInFaecher >= 5) {
       return {
-        ebbrPassed: false,
-        ebbrStatus: 'eBBR: Nicht bestanden, mehr als 1x5 in Kernfach und als 4 x 5 in Fächer- zu viele Durchfallkriterien überschritten',
-        msaPassed: false,
-        msaStatus: 'MSA: Nicht bestanden, mehr als 1x5 in Kernfach und als 4 x 5 in Fächer- zu viele Durchfallkriterien überschritten',
         bbrPassed: false,
-        bbrStatus: bbrStatus,
-        average,
-        uebergangGymnasialeOberstufe: false,
-        uebergangReason: 'Mehr als 1x5 in Kernfach und als 4 x 5 in Fächer- zu viele Durchfallkriterien überschritten'
+        bbrStatus: 'BBR: Nicht bestanden, 1x5 in Kernfach und 5x5 in Fächer',
+        ebbrPassed: false,
+        ebbrStatus: 'eBBR: Nicht bestanden, 1x5 in Kernfach und 5x5 in Fächer',
+        averageG
       }
-    };
+    }
 
     if (fivesInKernfaecher >= 1 && fivesInFaecher >= 1 ) {
       console.log('Fives in Kernfächer and Fächer:');
@@ -269,15 +264,11 @@ export class GradeCalculator {
           }
         } else {
       return {
-        ebbrPassed: false,
-        ebbrStatus: 'eBBR: Nicht bestanden wegen 1x 5 in Kernfach und 1x 5 in Fächer ohne ausreichende Noten',
-        msaPassed: false,
-        msaStatus: 'MSA: Nicht bestanden wegen 1x 5 in Kernfach und 1x 5 in Fächer ohne ausreichende Noten',
         bbrPassed: false,
-        bbrStatus: bbrStatus,
-        average,
-        uebergangGymnasialeOberstufe: false,
-        uebergangReason: 'Nicht bestanden wegen 1x 5 in Kernfach und 1x 5 in Fächer ohne ausreichende Noten'
+        bbrStatus: 'BBR: Nicht bestanden wegen 5 in Kernfach und Fächer ohne Ausgleich',
+        ebbrPassed: false,
+        ebbrStatus: 'eBBR: Nicht bestanden wegen 5 in Kernfach und Fächer ohne Ausgleich',
+        averageG
       };
     }
   }
@@ -290,40 +281,76 @@ export class GradeCalculator {
     
         } else {
           return {
-          ebbrPassed: false,
-          ebbrStatus: 'eBBR: Nicht bestanden wegen 2x 5 in Fächer ohne ausreichende Noten',
-          msaPassed: false,
-          msaStatus: 'MSA: Nicht bestanden wegen 2x 5 in Fächer ohne ausreichende Noten',
-          bbrPassed: false,
-          bbrStatus: bbrStatus,
-          average,
-          uebergangGymnasialeOberstufe: false,
-          uebergangReason: '2x Note 5 in Fächern ohne ausreichend gute Noten'
-      };
+            bbrPassed: false,
+            bbrStatus: 'BBR: Nicht bestanden wegen 2x5 in Fächer ohne Ausgleich',
+            ebbrPassed: false,
+            ebbrStatus: 'eBBR: Nicht bestanden wegen 2x5 in Fächer ohne Ausgleich',
+            averageG
+          };
     }
   }
   
 
     
 
+    return {
+      bbrPassed: true,
+      bbrStatus: 'BBR: Bestanden',
+      ebbrPassed: true,
+      ebbrStatus: 'eBBR: Bestanden',
+      averageG
+    };
+  }
+
+  private static calculateMSAGrades(grades: AllGradeInputs): {
+    msaPassed: boolean;
+    msaStatus: string;
+    averageE: number;
+    uebergangGymnasialeOberstufe: boolean;
+    uebergangReason: string;
+  } {
+    // Get all grades - always use gradeE for MSA calculations
+    const kernfaecherGrades = Object.values(grades.kernfaecher)
+      .filter(g => g.points !== '')
+      .map(g => parseInt(g.gradeE));
+
+    const faecherGrades = Object.values(grades.faecher)
+      .filter(g => g.points !== '')
+      .map(g => parseInt(g.gradeE));
+
+    // Count grades
+    const allGrades = [...kernfaecherGrades, ...faecherGrades];
+    const gradeCount = allGrades.length;
+
+    if (gradeCount === 0) {
+      return {
+        msaPassed: false,
+        msaStatus: 'MSA: Keine Noten eingegeben',
+        averageE: 0,
+        uebergangGymnasialeOberstufe: false,
+        uebergangReason: 'Übergang Gymnasiale Oberstufe: Nein, keine Noten eingegeben'
+      };
+    }
+
+    // Calculate E average
+    const averageE = Number((allGrades.reduce((a, b) => a + b, 0) / gradeCount).toFixed(1));
+
     // Count E-Level grades for MSA and Übergang checks
     const { kernfaecherELevel, faecherELevel } = this.countELevelGrades(grades);
     
     // Check MSA and Übergang Gymnasiale Oberstufe
-    const uebergangResult = this.checkUebergangGymnasialeOberstufe(grades, average);
+    const uebergangResult = this.checkUebergangGymnasialeOberstufe(grades, averageE);
 
     // Check MSA with detailed reason
     let msaPassed = false;
     let msaStatus = '';
-    if (average > 3.0) {
+    const totalELevel = kernfaecherELevel + faecherELevel;
+    if (averageE > 3.0) {
       msaPassed = false;
-      msaStatus = `MSA: Nicht bestanden, Notendurchschnitt ${average} ist über 3,0`;
-    } else if (kernfaecherELevel < 2) {
+      msaStatus = `MSA: Nicht bestanden, Notendurchschnitt ${averageE} ist über 3,0`;
+    } else if (totalELevel < 2) {
       msaPassed = false;
-      msaStatus = 'MSA: Nicht bestanden, weniger als 2 E-Kurse in Kernfächern mit Note 3 oder besser';
-    } else if ((kernfaecherELevel + faecherELevel) < 3) {
-      msaPassed = false;
-      msaStatus = 'MSA: Nicht bestanden, weniger als 3 E-Kurse insgesamt mit Note 3 oder besser';
+      msaStatus = 'MSA: Nicht bestanden, weniger als 2 E-Kurse mit Note 3 oder besser';
     } else {
       msaPassed = true;
       msaStatus = 'MSA: Bestanden';
@@ -335,15 +362,21 @@ export class GradeCalculator {
       : `Übergang Gymnasiale Oberstufe: Nein, ${uebergangResult.reason}`;
 
     return {
-      ebbrPassed: true,
-      ebbrStatus: 'eBBR: Bestanden',
       msaPassed,
       msaStatus,
-      bbrPassed,
-      bbrStatus,
-      average,
+      averageE,
       uebergangGymnasialeOberstufe: uebergangResult.qualified,
       uebergangReason: uebergangStatus
+    };
+  }
+
+  public static calculateGrades(grades: AllGradeInputs): GradeStats {
+    const bbrResults = this.calculateBBRGrades(grades);
+    const msaResults = this.calculateMSAGrades(grades);
+
+    return {
+      ...bbrResults,
+      ...msaResults
     };
   }
 }

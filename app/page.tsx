@@ -11,29 +11,29 @@ import { AllGradeInputs, GradeStats, ExamGrades, GradeWithLevel, convertPointsTo
 export default function Home() {
   const [grades, setGrades] = useState<AllGradeInputs>({
     kernfaecher: {
-      deutsch: { points: '', grade: '', level: 'G' },
-      mathe: { points: '', grade: '', level: 'G' },
-      ersteFremdsprache: { points: '', grade: '', level: 'G' }
+      deutsch: { points: '', gradeE: '', gradeG: '', level: 'G' },
+      mathe: { points: '', gradeE: '', gradeG: '', level: 'G' },
+      ersteFremdsprache: { points: '', gradeE: '', gradeG: '', level: 'G' }
     },
     faecher: {
-      wAT: { points: '', grade: '', level: 'M' },
-      biologie: { points: '', grade: '', level: 'G' },
-      physik: { points: '', grade: '', level: 'G' },
-      chemie: { points: '', grade: '', level: 'G' },
-      ethik: { points: '', grade: '', level: 'M' },
-      geWi: { points: '', grade: '', level: 'M' },
-      musik: { points: '', grade: '', level: 'M' },
-      kunst: { points: '', grade: '', level: 'M' },
-      sport: { points: '', grade: '', level: 'M' },
-      französich: { points: '', grade: '', level: 'M' }
+      wAT: { points: '', gradeE: '', gradeG: '', level: 'M' },
+      biologie: { points: '', gradeE: '', gradeG: '', level: 'G' },
+      physik: { points: '', gradeE: '', gradeG: '', level: 'G' },
+      chemie: { points: '', gradeE: '', gradeG: '', level: 'G' },
+      ethik: { points: '', gradeE: '', gradeG: '', level: 'M' },
+      geWi: { points: '', gradeE: '', gradeG: '', level: 'M' },
+      musik: { points: '', gradeE: '', gradeG: '', level: 'M' },
+      kunst: { points: '', gradeE: '', gradeG: '', level: 'M' },
+      sport: { points: '', gradeE: '', gradeG: '', level: 'M' },
+      französich: { points: '', gradeE: '', gradeG: '', level: 'M' }
     }
   });
 
   const [examGrades, setExamGrades] = useState<ExamGrades>({
-    deutsch: { points: '', grade: '', level: 'G' },
-    mathematik: { points: '', grade: '', level: 'G' },
-    fremdsprache: { points: '', grade: '', level: 'G' },
-    praesentation: { points: '', grade: '', level: 'G' }
+    deutsch: { points: '', gradeE: '', gradeG: '', level: 'G' },
+    mathematik: { points: '', gradeE: '', gradeG: '', level: 'G' },
+    fremdsprache: { points: '', gradeE: '', gradeG: '', level: 'G' },
+    praesentation: { points: '', gradeE: '', gradeG: '', level: 'G' }
   });
 
   const [gradeStats, setGradeStats] = useState<GradeStats>({
@@ -43,7 +43,8 @@ export default function Home() {
     msaStatus: '',
     bbrPassed: false,
     bbrStatus: '',
-    average: 0,
+    averageG: 0,
+    averageE: 0,
     uebergangGymnasialeOberstufe: false,
     uebergangReason: undefined
   });
@@ -55,16 +56,16 @@ export default function Home() {
       const points = e.target.value;
       setGrades(prev => {
         const currentGrade = prev[category][subject as keyof typeof prev[typeof category]] as GradeWithLevel;
-        const grade = points ?
-          (currentGrade.level === 'G' ? convertPointsToGradeG(Number(points)) : convertPointsToGrade(Number(points))).toString()
-          : '';
+        const gradeE = points ? convertPointsToGrade(Number(points)).toString() : '';
+        const gradeG = points ? convertPointsToGradeG(Number(points)).toString() : '';
         
         const updatedCategory = {
           ...prev[category],
           [subject]: {
             ...(prev[category][subject as keyof typeof prev[typeof category]] as GradeWithLevel),
             points,
-            grade
+            gradeE,
+            gradeG
           }
         };
         return {
@@ -84,16 +85,16 @@ export default function Home() {
 
         const newLevel = e.target.checked ? 'E' : 'G';
         // Recalculate grade based on new level if points exist
-        const grade = currentGrade.points ?
-          (newLevel === 'G' ? convertPointsToGradeG(Number(currentGrade.points)) : convertPointsToGrade(Number(currentGrade.points))).toString()
-          : currentGrade.grade;
+        const gradeE = currentGrade.points ? convertPointsToGrade(Number(currentGrade.points)).toString() : '';
+        const gradeG = currentGrade.points ? convertPointsToGradeG(Number(currentGrade.points)).toString() : '';
 
         const updatedCategory = {
           ...prev[category],
           [subject]: {
             ...currentGrade,
             level: newLevel,
-            grade
+            gradeE,
+            gradeG
           }
         };
         return {
@@ -106,14 +107,16 @@ export default function Home() {
   const handleExamInputChange = (field: keyof ExamGrades) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const points = e.target.value;
-      const grade = points ? convertPointsToGrade(Number(points)).toString() : '';
+      const gradeE = points ? convertPointsToGrade(Number(points)).toString() : '';
+      const gradeG = points ? convertPointsToGradeG(Number(points)).toString() : '';
       
       setExamGrades(prev => ({
         ...prev,
         [field]: {
           ...prev[field],
           points,
-          grade
+          gradeE,
+          gradeG
         }
       }));
     };
