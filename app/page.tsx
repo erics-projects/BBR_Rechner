@@ -2,11 +2,12 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { GradeInput } from "./components/GradeInput";
-import { ResultsDisplay } from "./components/ResultsDisplay";
+import { ResultsDisplayGrades } from "./components/ResultsDisplayGrades";
+import { ResultsDisplayExam } from "./components/ResultsDisplayExam";
 import { ExamGradeInput } from "./components/ExamGradeInput";
 import { GradeCalculator } from "./services/gradeCalculator";
 import { ExamCalculator } from "./services/examCalculator";
-import { AllGradeInputs, GradeStats, ExamGrades, GradeWithLevel, convertPointsToGrade, convertPointsToGradeG } from "./types/grades";
+import { AllGradeInputs, GradeStats, ExamGrades, GradeWithLevel, convertPointsToGrade, convertPointsToGradeG} from "./types/grades";
 
 export default function Home() {
   const [grades, setGrades] = useState<AllGradeInputs>({
@@ -30,10 +31,10 @@ export default function Home() {
   });
 
   const [examGrades, setExamGrades] = useState<ExamGrades>({
-    deutsch: { points: '', gradeE: '', gradeG: '', level: 'G' },
-    mathematik: { points: '', gradeE: '', gradeG: '', level: 'G' },
-    fremdsprache: { points: '', gradeE: '', gradeG: '', level: 'G' },
-    praesentation: { points: '', gradeE: '', gradeG: '', level: 'G' }
+    deutsch: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '112' },
+    mathematik: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '60' },
+    fremdsprache: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '75' },
+    praesentation: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '35' },
   });
 
   const [gradeStats, setGradeStats] = useState<GradeStats>({
@@ -48,8 +49,6 @@ export default function Home() {
     uebergangGymnasialeOberstufe: false,
     uebergangReason: undefined
   });
-
-  const [examResult, setExamResult] = useState('');
 
   const handleInputChange = (category: 'kernfaecher' | 'faecher', subject: string) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,42 +104,34 @@ export default function Home() {
     };
 
   const handleExamInputChange = (field: keyof ExamGrades) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const points = e.target.value;
-      const gradeE = points ? convertPointsToGrade(Number(points)).toString() : '';
-      const gradeG = points ? convertPointsToGradeG(Number(points)).toString() : '';
-      
-      setExamGrades(prev => ({
-        ...prev,
-        [field]: {
-          ...prev[field],
-          points,
-          gradeE,
-          gradeG
-        }
-      }));
-    };
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        const points = e.target.value;
 
-  const handleExamLevelChange = (field: keyof ExamGrades) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setExamGrades(prev => ({
-        ...prev,
-        [field]: {
-          ...prev[field],
-          level: e.target.checked ? 'E' : 'G'
-        }
-      }));
-    };
+
+        setExamGrades(prev => ({
+          ...prev,
+          [field]: {
+            ...prev[field],
+            points
+          }
+        }));
+      };
 
   const calculateGrades = () => {
     const result = GradeCalculator.calculateGrades(grades);
     setGradeStats(result);
   };
 
-  const calculateExamGrades = () => {
-    const result = ExamCalculator.calculateExamGrades(examGrades);
-    setExamResult(result);
-  };
+  // create calculateExamGrades function
+  // that uses the ExamCalculator class to calculate the exam grades
+  // updates the ExamGrades state with the calculated grades
+    const calculateExamGrades = () => {
+        const result = ExamCalculator.calculateExamGrades(examGrades);
+        setExamGrades(result);
+      setShowExamResults(true); // Show results after calculation
+    }
+
+  const [showExamResults, setShowExamResults] = useState(false);
 
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
@@ -176,21 +167,21 @@ export default function Home() {
           >
             Berechnen
           </button>
-          <ResultsDisplay gradeStats={gradeStats} />
+          <ResultsDisplayGrades gradeStats={gradeStats} />
         </div>
 
         <ExamGradeInput 
           examGrades={examGrades}
           onInputChange={handleExamInputChange}
-          onLevelChange={handleExamLevelChange}
           onCalculate={calculateExamGrades}
         />
-
-        {examResult && (
+        {showExamResults && <ResultsDisplayExam examGrades={examGrades} />}
+        {/*<ResultsDisplayExam examGrades={examGrades} />*/}
+        {/*{examResult && (
           <div className={`font-medium mt-4 ${examResult.includes('bestanden') && !examResult.includes('nicht') ? 'text-green-400' : 'text-red-400'}`}>
             Prüfungen: {examResult}
           </div>
-        )}
+        )}*/}
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
         <p className="text-sm text-center text-foreground">

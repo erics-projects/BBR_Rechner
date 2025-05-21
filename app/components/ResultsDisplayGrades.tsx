@@ -4,11 +4,8 @@ interface ResultsDisplayProps {
   gradeStats: GradeStats;
 }
 
-export function ResultsDisplay({ gradeStats }: ResultsDisplayProps) {
-  // Only render if we have grades to display
-  if (!gradeStats.averageG && !gradeStats.averageE) {
-    return null;
-  }
+export function ResultsDisplayGrades({ gradeStats }: ResultsDisplayProps) {
+
 
   return (
     <div className="bg-transparent text-white font-medium flex flex-col gap-3">

@@ -1,9 +1,41 @@
+
+//Grades for Jahrgang
 export interface GradeWithLevel {
   points: string;
   gradeE: string;
   gradeG: string;
   level: 'E' | 'G' | 'M';
 }
+
+// Exam Grades
+export interface ExamGrades {
+  deutsch: {
+    points: string;
+    gradeMSA: string;
+    gradeEBBR: string;
+    maxPoints: string;
+  };
+  mathematik: {
+    points: string;
+    gradeMSA: string;
+    gradeEBBR: string;
+    maxPoints: string;
+  };
+  fremdsprache: {
+    points: string;
+    gradeMSA: string;
+    gradeEBBR: string;
+    maxPoints: string;
+  };
+  praesentation: {
+    points: string;
+    gradeMSA: string;
+    gradeEBBR: string;
+    maxPoints: string;
+  };
+}
+
+
 
 export const convertPointsToGrade = (points: number): number => {
   if (points >= 13) return 1;
@@ -44,13 +76,6 @@ export interface FaecherInputs {
 export interface AllGradeInputs {
   kernfaecher: KernfaecherInputs;
   faecher: FaecherInputs;
-}
-
-export interface ExamGrades {
-  deutsch: GradeWithLevel;
-  mathematik: GradeWithLevel;
-  fremdsprache: GradeWithLevel;
-  praesentation: GradeWithLevel;
 }
 
 export interface GradeStats {

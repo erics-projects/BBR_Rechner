@@ -63,12 +63,11 @@ export function GradeInput({ grades, onInputChange, onLevelChange }: GradeInputP
                     className="w-full border rounded p-2 dark:bg-gray-800"
                     placeholder="0-15"
                   />
-                  <div className="text-xs text-gray-500 mt-1">Punkte (0-15)</div>
                 </div>
                 {value.points !== '' && (
                   <div className="mt-2 text-sm flex flex-col">
-                    <span>E: {value.gradeE}</span>
-                    <span>G: {value.gradeG}</span>
+                    <span>E-Note: {value.gradeE}</span>
+                    <span>G-Note: {value.gradeG}</span>
                   </div>
                 )}
               </div>
@@ -112,12 +111,11 @@ export function GradeInput({ grades, onInputChange, onLevelChange }: GradeInputP
                     className="w-full border rounded p-2 dark:bg-gray-800"
                     placeholder="0-15"
                   />
-                  <div className="text-xs text-gray-500 mt-1">Punkte (0-15)</div>
                 </div>
                 {value.points !== '' && (
                   <div className="mt-2 text-sm flex flex-col">
-                    <span>E: {value.gradeE}</span>
-                    <span>G: {value.gradeG}</span>
+                    <span>E-Note: {value.gradeE}</span>
+                    <span>G-Note: {value.gradeG}</span>
                   </div>
                 )}
               </div>

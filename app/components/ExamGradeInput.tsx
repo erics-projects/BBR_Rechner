@@ -3,15 +3,14 @@ import { ExamGrades } from '../types/grades';
 interface ExamGradeInputProps {
   examGrades: ExamGrades;
   onInputChange: (field: keyof ExamGrades) => (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onLevelChange: (field: keyof ExamGrades) => (e: React.ChangeEvent<HTMLInputElement>) => void;
   onCalculate: () => void;
 }
 
-export function ExamGradeInput({ examGrades, onInputChange, onLevelChange, onCalculate }: ExamGradeInputProps) {
+export function ExamGradeInput({ examGrades, onInputChange, onCalculate }: ExamGradeInputProps) {
   const displayNames = {
     deutsch: 'Deutsch',
     mathematik: 'Mathematik',
-    fremdsprache: '1. Fremdsprache',
+    fremdsprache: 'Erste Fremdsprache',
     praesentation: 'Präsentation'
   };
 
@@ -33,19 +32,17 @@ export function ExamGradeInput({ examGrades, onInputChange, onLevelChange, onCal
                   <input
                     type="number"
                     min="0"
-                    max="15"
+                    max={value.maxPoints}
                     step="1"
                     value={value.points}
                     onChange={onInputChange(field as keyof ExamGrades)}
                     className="w-full border rounded p-2 dark:bg-gray-800"
-                    placeholder="0-15"
+                    placeholder={`0-${value.maxPoints}`}
                   />
-                  <div className="text-xs text-gray-500 mt-1">Punkte (0-15)</div>
                 </div>
                 {value.points !== '' && (
                   <div className="mt-2 text-sm flex flex-col">
-                    <span>E: {value.gradeE}</span>
-                    <span>G: {value.gradeG}</span>
+                    <span>{value.grade}</span>
                   </div>
                 )}
               </div>
