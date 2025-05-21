@@ -6,18 +6,6 @@ interface ResultsDisplayProps {
 }
 
 export function ResultsDisplayExam({ examGrades }: ResultsDisplayProps) {
-    // Only render if there is at least one exam filled
-    if (
-        !examGrades ||
-        !Object.values(examGrades).some(exam =>
-            exam &&
-            Object.values(exam).some(value => value !== undefined && value !== null && value !== '')
-        )
-    ) {
-        return null;
-    }
-
-    const subjects = Object.entries(examGrades);
 
     return (
 
