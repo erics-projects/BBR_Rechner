@@ -67,6 +67,7 @@ export default function Home() {
             gradeG
           }
         };
+
         return {
           ...prev,
           [category]: updatedCategory
@@ -123,6 +124,7 @@ export default function Home() {
         });
       };
 
+  const [showExamResults, setShowExamResults] = useState(false);
   const calculateGrades = () => {
     const result = GradeCalculator.calculateGrades(grades);
     setGradeStats(result);
@@ -137,7 +139,6 @@ export default function Home() {
       setShowExamResults(true); // Show results after calculation
     }
 
-  const [showExamResults, setShowExamResults] = useState(false);
 
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">

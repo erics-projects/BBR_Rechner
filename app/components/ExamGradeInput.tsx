@@ -46,8 +46,8 @@ export function ExamGradeInput({ examGrades, onInputChange, onCalculate }: ExamG
 
                 {value.points !== '' && (
                     <div className="mt-2 text-sm flex flex-col">
-                      <span>eBBR: {value.gradeMSA}</span>
-                      <span>MSA: {value.gradeEBBR}</span>
+                      <span>eBBR: {value.gradeEBBR}</span>
+                      <span>MSA: {value.gradeMSA}</span>
                     </div>
                 )}
               </div>
