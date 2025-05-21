@@ -42,7 +42,7 @@ export class GradeCalculator {
     const validGrades = [...Object.values(grades.kernfaecher), ...Object.values(grades.faecher)]
       .filter(g => g.points !== '')
       .map(g => {
-        if (g.level === 'G') {
+        if (g.level === 'G' ) {
           return parseInt(g.gradeG);
         } else {  // E or M level
           return parseInt(g.gradeE);
@@ -174,59 +174,97 @@ export class GradeCalculator {
     return { kernfaecherELevel, faecherELevel };
   }
 
-  private static checkUebergangGymnasialeOberstufe(
-    grades: AllGradeInputs,
-    averageE: number
-  ): { qualified: boolean; reason?: string } {
-    if (averageE > 3.0) {
-      return {
-        qualified: false,
-        reason: `Notendurchschnitt ${averageE} ist schlechter als 3,0`
-      };
-    }
+  // private static checkUebergangGymnasialeOberstufe(
+  //   grades: AllGradeInputs,
+  //   averageE: number
+  // ): { qualified: boolean; reason?: string } {
+  //   if (averageE > 3.0) {
+  //     return {
+  //       qualified: false,
+  //       reason: `Notendurchschnitt ${averageE} ist schlechter als 3,0`
+  //     };
+  //   }
 
-    // Check if all grades are 4 or better
-    const allGrades = [
-      ...Object.values(grades.kernfaecher),
-      ...Object.values(grades.faecher)
-    ];
-    // For Übergang, we only check E-level grades
-    const eGrades = allGrades.filter(g => g.level === 'E');
-    if (eGrades.some(g => g.gradeE && parseInt(g.gradeE) > 4)) {
-      return {
-        qualified: false,
-        reason: 'Alle Noten müssen 4 oder besser sein'
-      };
-    }
+  //   // Check if all grades are 4 or better
+  //   const allGrades = [
+  //     ...Object.values(grades.kernfaecher),
+  //     ...Object.values(grades.faecher)
+  //   ];
+  //   // For Übergang, we only check E-level grades
+  //   const eGrades = allGrades.filter(g => g.level === 'E');
+  //   if (eGrades.some(g => g.gradeE && parseInt(g.gradeE) > 4)) {
+  //     return {
+  //       qualified: false,
+  //       reason: 'Alle Noten müssen 4 oder besser sein'
+  //     };
+  //   }
 
-    const { kernfaecherELevel, faecherELevel } = this.countELevelGrades(grades);
+  //   const { kernfaecherELevel, faecherELevel } = this.countELevelGrades(grades);
 
-    // Need at least 2 E-Level grades in Kernfaecher with grade 3 or better
-    if (kernfaecherELevel < 2) {
-      return {
-        qualified: false,
-        reason: 'Mindestens 2 E-Kurse in Kernfächern mit Note 3 oder besser benötigt'
-      };
-    }
+  //   // Need at least 2 E-Level grades in Kernfaecher with grade 3 or better
+  //   if (kernfaecherELevel < 2) {
+  //     return {
+  //       qualified: false,
+  //       reason: 'Mindestens 2 E-Kurse in Kernfächern mit Note 3 oder besser benötigt'
+  //     };
+  //   }
 
-    // Need at least 2 E-Level grades in total with grade 3 or better
-    const totalELevel = kernfaecherELevel + faecherELevel;
-    if (totalELevel < 2) {
-      return {
-        qualified: false,
-        reason: 'Insgesamt mindestens 2 E-Kurse mit Note 3 oder besser benötigt'
-      };
-    }
+  //   // Need at least 2 E-Level grades in total with grade 3 or better
+  //   const totalELevel = kernfaecherELevel + faecherELevel;
+  //   if (totalELevel < 2) {
+  //     return {
+  //       qualified: false,
+  //       reason: 'Insgesamt mindestens 2 E-Kurse mit Note 3 oder besser benötigt'
+  //     };
+  //   }
 
-    return { qualified: true };
-  }
-
+  //   return { qualified: true };
+  // }
   private static calculateBBRGrades(grades: AllGradeInputs): {
     bbrPassed: boolean;
     bbrStatus: string;
+    averageG: number;
+  } {
+      const averageG = this.calculateAverageG(grades);
+      
+    //check if deutsch and mathe are at least one 4  and one 5 or better
+    const deutschGrade = parseInt(grades.kernfaecher.deutsch.gradeG);
+    const matheGrade = parseInt(grades.kernfaecher.mathe.gradeG);
+      // Determine BBR status and reason
+    let bbrPassed = false;
+    let bbrStatus = '';
+  
+    if ( isNaN(deutschGrade) || isNaN(matheGrade)) {
+      bbrPassed = false;
+      bbrStatus = 'BBR: Nicht bestanden, weil Deutsch oder Mathematik nicht belegt wurde.';
+    }else if (averageG > 4.2) {
+      bbrPassed = false;
+      bbrStatus = `BBR: Nicht bestanden, weil der Notendurchschnitt ${averageG} über 4,2 ist.`;
+    } else if (deutschGrade === 6) {
+      bbrPassed = false;
+      bbrStatus = 'BBR: Nicht bestanden, weil Deutsch mit Note 6 bewertet wurde.';
+    } else if (matheGrade === 6) {
+      bbrPassed = false;
+      bbrStatus = 'BBR: Nicht bestanden, weil Mathematik mit Note 6 bewertet wurde.';
+    } else if ((deutschGrade + matheGrade) > 9) {
+      bbrPassed = false;
+      bbrStatus = `BBR: Nicht bestanden, weil die Noten in Deutsch und Mathematik beide schlechter als 5 sind.`;
+    } else {
+      bbrPassed = true;
+      bbrStatus = 'BBR: Bestanden';
+    }
+
+
+    return{
+      bbrPassed: bbrPassed,
+      bbrStatus: bbrStatus,
+      averageG: averageG
+    }
+  }
+
+  private static calculateEBBRGrades(grades: AllGradeInputs): {
     ebbrPassed: boolean;
     ebbrStatus: string;
-    averageG: number;
   } {
     // Always use gradeG for BBR/eBBR calculations regardless of level
     const kernfaecherGrades = Object.values(grades.kernfaecher)
@@ -241,25 +279,17 @@ export class GradeCalculator {
 
     if (allGrades.length === 0) {
       return {
-        bbrPassed: false,
-        bbrStatus: 'BBR: Keine Noten eingegeben',
         ebbrPassed: false,
         ebbrStatus: 'eBBR: Keine Noten eingegeben',
-        averageG: 0
       };
     }
-
-    const averageG = this.calculateAverageG(grades);
 
     // Check general failing conditions
     const failCheck = this.checkFailingConditions(kernfaecherGrades, faecherGrades, 'BBR');
     if (failCheck) {
       return {
-        bbrPassed: false,
-        bbrStatus: failCheck.reason,
         ebbrPassed: false,
         ebbrStatus: failCheck.reason.replace('BBR:', 'eBBR:'),
-        averageG
       };
     }
 
@@ -292,11 +322,8 @@ export class GradeCalculator {
         }
       } else {
         return {
-          bbrPassed: false,
-          bbrStatus: 'BBR: Nicht bestanden wegen 1x 6 in Fächer ohne ausgleichende Noten',
           ebbrPassed: false,
           ebbrStatus: 'eBBR: Nicht bestanden wegen 1x 6 in Fächer ohne ausgleichende Noten',
-          averageG
         };
       }
     }
@@ -322,11 +349,8 @@ export class GradeCalculator {
         }
       } else {
         return {
-          bbrPassed: false,
-          bbrStatus: 'BBR: Nicht bestanden wegen 5 in Kernfach und Fächer ohne Ausgleich',
           ebbrPassed: false,
           ebbrStatus: 'eBBR: Nicht bestanden wegen 5 in Kernfach und Fächer ohne Ausgleich',
-          averageG
         };
       }
     }
@@ -338,32 +362,16 @@ export class GradeCalculator {
         gradesThreeOrBetterF -= 2;
       } else {
         return {
-          bbrPassed: false,
-          bbrStatus: 'BBR: Nicht bestanden wegen 2x5 in Fächer ohne Ausgleich',
           ebbrPassed: false,
           ebbrStatus: 'eBBR: Nicht bestanden wegen 2x5 in Fächer ohne Ausgleich',
-          averageG
         };
       }
     }
-     // Check average requirement
-    if (averageG > 4.2) {
-      return {
-        bbrPassed: false,
-        bbrStatus: `BBR: Nicht bestanden, weil der Notendurchschnitt ${averageG} über 4,2 ist.`,
-        ebbrPassed: true,
-        ebbrStatus: `eBBR: Bestanden.`,
-        averageG
-      };
-    }
-
+    
     // If all compensations are successful
     return {
-      bbrPassed: true,
-      bbrStatus: 'BBR: Bestanden',
       ebbrPassed: true,
       ebbrStatus: 'eBBR: Bestanden',
-      averageG
     };
   }
 
@@ -597,11 +605,13 @@ export class GradeCalculator {
 
   public static calculateGrades(grades: AllGradeInputs): GradeStats {
     const bbrResults = this.calculateBBRGrades(grades);
+    const ebbrResults = this.calculateEBBRGrades(grades);
     const msaResults = this.calculateMSAGrades(grades);   
     const msaGymResults = this.calculateMSAGo(grades, msaResults);
 
     return {
       ...bbrResults,
+      ...ebbrResults,
       ...msaResults,
       ...msaGymResults,
     };
