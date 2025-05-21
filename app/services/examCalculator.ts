@@ -40,7 +40,7 @@ export class ExamCalculator {
 
     // change the points to grades
     // 1 point = 6; 2 points =5; 3 points = 4; 4 points = 3; 5 points = 2; 6 points = 1
-    const calculatedGrades: ExamGrades = {
+     const calculatedGrades: ExamGrades = {
       deutsch: {
         points: examGrades.deutsch.points,
         gradeMSA: examGrades.deutsch.points ? convertExamPointsToGrade(Number(examGrades.deutsch.points), MSA_deutschGradeMapping).toString() : '',
@@ -90,15 +90,12 @@ export class ExamCalculator {
         }
       }
       if (grade === '1' || grade === '2' || grade === '3') {
-        console.log('3 or better Counter: !!!!!!!!!!!');
         threeOrBetterCounter++;
       }
 
 
     }
     if (fiveCounter===1){
-      console.log('One 5 only');
-      console.log('3 or better Counter: ', threeOrBetterCounter);
       // check if there is a 3 or less
       if (threeOrBetterCounter >= 1) {
         passed = true;
