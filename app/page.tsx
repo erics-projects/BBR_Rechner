@@ -107,14 +107,20 @@ export default function Home() {
       (e: React.ChangeEvent<HTMLInputElement>) => {
         const points = e.target.value;
 
+        setExamGrades(prev => {
+          const updatedExamGrades = {
+            ...prev,
+            [field]: {
+              ...prev[field],
+              points
+            }
+          };
 
-        setExamGrades(prev => ({
-          ...prev,
-          [field]: {
-            ...prev[field],
-            points
-          }
-        }));
+          // Recalculate grades based on updated points
+          const recalculatedGrades = ExamCalculator.calculateExamGrades(updatedExamGrades);
+
+          return recalculatedGrades;
+        });
       };
 
   const calculateGrades = () => {
@@ -165,7 +171,7 @@ export default function Home() {
             className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
             onClick={calculateGrades}
           >
-            Berechnen
+            Testen
           </button>
           <ResultsDisplayGrades gradeStats={gradeStats} />
         </div>

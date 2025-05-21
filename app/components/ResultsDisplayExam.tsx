@@ -22,25 +22,16 @@ export function ResultsDisplayExam({ examGrades }: ResultsDisplayProps) {
     return (
 
         <div className="bg-transparent text-white font-medium flex flex-col gap-3">
-            <h2 className="text-lg font-semibold">Ergebnisse</h2>
-            <div
-                className={ExamCalculator.calculateExamStatus(examGrades).msaPassed ? "text-green-400" : "text-red-400"}>
-                {`MSA Grade: ${ExamCalculator.calculateExamStatus(examGrades).msaPassed ? 'Passed' : 'Failed'}`}
-            </div>
             <div
                 className={ExamCalculator.calculateExamStatus(examGrades).ebbrPassed ? "text-green-400" : "text-red-400"}>
-                {`EBBR Grade: ${ExamCalculator.calculateExamStatus(examGrades).ebbrPassed ? 'Passed' : 'Failed'}`}
+                {`eBBR: ${ExamCalculator.calculateExamStatus(examGrades).ebbrPassed ? 'Bestanden' : 'Nicht bestanden'}`}
+            </div>
+            <div
+                className={ExamCalculator.calculateExamStatus(examGrades).msaPassed ? "text-green-400" : "text-red-400"}>
+                {`MSA: ${ExamCalculator.calculateExamStatus(examGrades).msaPassed ? 'Bestanden' : 'Nicht bestanden'}`}
             </div>
 
-            {/* Display each subject's MSA and EBBR grades */}
-            {subjects.map(([subject, grades]) => (
 
-                // Display each subject's MSA and EBBR grades
-                <div key={subject} className="flex flex-col">
-                    <div className="text-green-400">{`${subject.charAt(0).toUpperCase() + subject.slice(1)} MSA Grade: ${grades.gradeMSA}`}</div>
-                    <div className="text-green-400">{`${subject.charAt(0).toUpperCase() + subject.slice(1)} EBBR Grade: ${grades.gradeEBBR}`}</div>
-                </div>
-            ))}
         </div>
     );
 }

@@ -65,10 +65,10 @@ export function GradeInput({ grades, onInputChange, onLevelChange }: GradeInputP
                   />
                 </div>
                 {value.points !== '' && (
-                  <div className="mt-2 text-sm flex flex-col">
-                    <span>E-Note: {value.gradeE}</span>
-                    <span>G-Note: {value.gradeG}</span>
-                  </div>
+                    <div className="mt-2 text-sm flex flex-col">
+                      <span>G-Note: {value.gradeG}</span>
+                      <span>E-Note: {value.gradeE}</span>
+                    </div>
                 )}
               </div>
             </div>
@@ -113,10 +113,10 @@ export function GradeInput({ grades, onInputChange, onLevelChange }: GradeInputP
                   />
                 </div>
                 {value.points !== '' && (
-                  <div className="mt-2 text-sm flex flex-col">
-                    <span>E-Note: {value.gradeE}</span>
-                    <span>G-Note: {value.gradeG}</span>
-                  </div>
+                    <div className="mt-2 text-sm flex flex-col">
+                      <span>G-Note: {value.gradeG}</span>
+                      <span>E-Note: {value.gradeE}</span>
+                    </div>
                 )}
               </div>
             </div>

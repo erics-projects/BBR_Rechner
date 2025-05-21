@@ -2,7 +2,11 @@ import { ExamGrades } from '../types/grades';
 
 interface ExamGradeInputProps {
   examGrades: ExamGrades;
-  onInputChange: (field: keyof ExamGrades) => (e: React.ChangeEvent<HTMLInputElement>) => void;
+  // OnInputChange call the calculatedGrades function
+    // to calculate the grades based on the points input
+    onInputChange: (field: keyof ExamGrades) => (e: React.ChangeEvent<HTMLInputElement>) => void;
+
+  // onInputChange: (field: keyof ExamGrades) => (e: React.ChangeEvent<HTMLInputElement>) => void;
   onCalculate: () => void;
 }
 
@@ -17,18 +21,17 @@ export function ExamGradeInput({ examGrades, onInputChange, onCalculate }: ExamG
   return (
     <div className="flex flex-col gap-6 w-full max-w-4xl">
       <div className="space-y-4">
-        <h2 className="text-lg font-semibold">Prüfungsnoten</h2>
+        <h2 className="text-lg font-semibold">Prüfungen</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {Object.entries(examGrades).map(([field, value]) => (
             <div key={field} className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium flex items-center gap-2">
                   {displayNames[field as keyof ExamGrades]}
-
                 </label>
               </div>
               <div className="flex gap-4 items-start">
-                <div className="w-3/4 sm:w-32">
+                <div className="w-2/3 sm:w-24">
                   <input
                     type="number"
                     min="0"
@@ -40,12 +43,15 @@ export function ExamGradeInput({ examGrades, onInputChange, onCalculate }: ExamG
                     placeholder={`0-${value.maxPoints}`}
                   />
                 </div>
+
                 {value.points !== '' && (
-                  <div className="mt-2 text-sm flex flex-col">
-                    <span>{value.grade}</span>
-                  </div>
+                    <div className="mt-2 text-sm flex flex-col">
+                      <span>eBBR: {value.gradeMSA}</span>
+                      <span>MSA: {value.gradeEBBR}</span>
+                    </div>
                 )}
               </div>
+
             </div>
           ))}
         </div>
@@ -54,7 +60,7 @@ export function ExamGradeInput({ examGrades, onInputChange, onCalculate }: ExamG
             className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
             onClick={onCalculate}
           >
-            Prüfungsnoten berechnen
+            Testen
           </button>
         </div>
       </div>
