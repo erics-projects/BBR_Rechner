@@ -3,7 +3,7 @@ import { ExamGrades } from '../types/grades';
 export const convertExamPointsToGrade = (points: number, gradeMapping: { [key: number]: String }): string => {
   for (const [threshold, grade] of Object.entries(gradeMapping).sort((a, b) => Number(b[0]) - Number(a[0]))) {
     if (points >= Number(threshold)) {
-      return grade;
+      return grade.toString();
     }
   }
   return '6'; // Default grade if no thresholds are met
@@ -70,7 +70,7 @@ export class ExamCalculator {
     return calculatedGrades;
   }
 
-  public static calculateExam(grades: Array<any>): Boolean {
+  public static calculateExam(grades: Array<any>): boolean {
     let passed = true;
     let fiveCounter = 0;
     let threeOrBetterCounter = 0;
