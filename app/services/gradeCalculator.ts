@@ -248,7 +248,7 @@ export class GradeCalculator {
       bbrStatus = 'BBR: Nicht bestanden, weil Mathematik mit Note 6 bewertet wurde.';
     } else if ((deutschGrade + matheGrade) > 9) {
       bbrPassed = false;
-      bbrStatus = `BBR: Nicht bestanden, weil die Noten in Deutsch und Mathematik beide schlechter als 5 sind.`;
+      bbrStatus = `BBR: Nicht bestanden, weil die Noten in Deutsch und Mathematik beide schlechter als 4 sind.`;
     } else {
       bbrPassed = true;
       bbrStatus = 'BBR: Bestanden';
@@ -582,7 +582,7 @@ export class GradeCalculator {
         uebergangGymnasialeOberstufe: false,
         uebergangReason: 'MSAgo: Nein, eine 6',
       };
-    } //
+    }
     
     
     else { 
