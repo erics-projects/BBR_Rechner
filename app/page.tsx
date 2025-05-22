@@ -7,6 +7,7 @@ import { ResultsDisplayExam } from "./components/ResultsDisplayExam";
 import { ExamGradeInput } from "./components/ExamGradeInput";
 import { GradeCalculator } from "./services/gradeCalculator";
 import { ExamCalculator } from "./services/examCalculator";
+import { ExamPresentationInput } from './components/ExamPresentationInput';
 import { AllGradeInputs, GradeStats, ExamGrades, GradeWithLevel, convertPointsToGrade, convertPointsToGradeG} from "./types/grades";
 
 export default function Home() {
@@ -34,8 +35,15 @@ export default function Home() {
     deutsch: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '120' },
     mathematik: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '60' },
     fremdsprache: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '75' },
-    praesentationSchriflich: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '75' },
-    praesentationMuendlich: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '75' },
+    praesentation: {pointsSchriftlich: '',
+      pointsMuendlich: '',
+      gradeMSA: '',
+      gradeEBBR:  '',
+      maxPointsSchriftlich:  '15',
+      maxPointsMuendlich:  '15',
+    },
+    // praesentationSchriflich: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '15' },
+    // praesentationMuendlich: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '15' },
   });
 
   const [gradeStats, setGradeStats] = useState<GradeStats>({
@@ -105,6 +113,16 @@ export default function Home() {
       });
     };
 
+  const handleExamPresentationInputChange = (field: keyof ExamGrades, subField?: 'pointsSchriftlich' | 'pointsMuendlich') =>
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = e.target;
+        setExamGrades((prev) => ({
+          ...prev,
+          [field]: subField
+              ? { ...prev[field], [subField]: value } // Update subfield for `praesentation`
+              : { ...prev[field], points: value },   // Update other fields
+        }));
+      };
   const handleExamInputChange = (field: keyof ExamGrades) =>
       (e: React.ChangeEvent<HTMLInputElement>) => {
         const points = e.target.value;
@@ -137,7 +155,7 @@ export default function Home() {
     const calculateExamGrades = () => {
         const result = ExamCalculator.calculateExamGrades(examGrades);
         setExamGrades(result);
-      setShowExamResults(true); // Show results after calculation
+        setShowExamResults(true); // Show results after calculation
     }
 
 
@@ -151,39 +169,53 @@ export default function Home() {
           <p className="text-lg text-gray-600 dark:text-gray-400">
             erweiterte Berufsbildungsreife (eBBR) und MSA Notenrechner für Berlin
           </p>
-    
+
           <a
-            href="https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abschluesse-an-der-iss-nach-klasse-9-und-10/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+              href="https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abschluesse-an-der-iss-nach-klasse-9-und-10/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
           >
             Alle Informationen finden Sie hier: berlin.de/...
           </a>
         </div>
 
-        <GradeInput 
-          grades={grades}
-          onInputChange={handleInputChange}
-          onLevelChange={handleLevelChange}
+        <GradeInput
+            grades={grades}
+            onInputChange={handleInputChange}
+            onLevelChange={handleLevelChange}
         />
 
         <div className="flex items-center gap-4">
           <button
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            onClick={calculateGrades}
+              className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
+              onClick={calculateGrades}
           >
             Testen
           </button>
-          <ResultsDisplayGrades gradeStats={gradeStats} />
+          <ResultsDisplayGrades gradeStats={gradeStats}/>
         </div>
 
-        <ExamGradeInput 
-          examGrades={examGrades}
-          onInputChange={handleExamInputChange}
-          onCalculate={calculateExamGrades}
+        <ExamGradeInput
+            examGrades={examGrades}
+            onInputChange={handleExamInputChange}
         />
-        {showExamResults && <ResultsDisplayExam examGrades={examGrades} />}
+        <ExamPresentationInput
+            value={{
+              pointsSchriftlich: examGrades.praesentation.pointsSchriftlich,
+              pointsMuendlich: examGrades.praesentation.pointsMuendlich,
+              maxPointsSchriftlich: examGrades.praesentation.maxPointsSchriftlich,
+              maxPointsMuendlich: examGrades.praesentation.maxPointsMuendlich,
+            }}
+            onInputChange={(subField) => handleExamPresentationInputChange('praesentation', subField)}
+        />
+        <button
+            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
+            onClick={calculateExamGrades}
+        >
+          Testen
+        </button>
+        {showExamResults && <ResultsDisplayExam examGrades={examGrades}/>}
         {/*<ResultsDisplayExam examGrades={examGrades} />*/}
         {/*{examResult && (
           <div className={`font-medium mt-4 ${examResult.includes('bestanden') && !examResult.includes('nicht') ? 'text-green-400' : 'text-red-400'}`}>

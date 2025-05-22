@@ -19,9 +19,11 @@ export function ResultsDisplayExam({ examGrades }: ResultsDisplayProps) {
                 {`MSA: ${ExamCalculator.calculateExamStatus(examGrades).msaPassed ? 'Bestanden' : 'Nicht bestanden'}`}
             </div>
             <div className="text-white">
-                {`Gesamtnote Präsentation: ${ExamCalculator.calculateExamStatus(examGrades).presentationGrade}`}
+                {`Gesamtnote Präsentation: ${ExamCalculator.calculateExamStatus(examGrades).presentationGrade_MSA}`}
             </div>
-
+            {/*<div className="text-white">*/}
+            {/*    {`Gesamtnote Präsentation nach eBBR: ${ExamCalculator.calculateExamStatus(examGrades).presentationGrade_EBBR}`}*/}
+            {/*</div>*/}
 
         </div>
     );
