@@ -15,7 +15,8 @@ export function ExamGradeInput({ examGrades, onInputChange, onCalculate }: ExamG
     deutsch: 'Deutsch',
     mathematik: 'Mathematik',
     fremdsprache: 'Erste Fremdsprache schriftlich',
-    praesentation: 'Präsentation'
+    praesentationSchriflich: 'Präsentation schriftlich',
+    praesentationMuendlich: 'Präsentation mündlich',
   };
 
   return (

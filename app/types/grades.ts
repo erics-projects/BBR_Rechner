@@ -27,7 +27,21 @@ export interface ExamGrades {
     gradeEBBR: string;
     maxPoints: string;
   };
-  praesentation: {
+  // praesentation: {
+  //   pointsSchriftlich: string;
+  //   pointsMuendlich:string;
+  //   gradeMSA: string;
+  //   gradeEBBR: string;
+  //   maxPointsSchriftlich: string;
+  //   maxPointsMuendlich: string;
+  // };
+  praesentationSchriflich: {
+    points: string;
+    gradeMSA: string;
+    gradeEBBR: string;
+    maxPoints: string;
+  };
+  praesentationMuendlich: {
     points: string;
     gradeMSA: string;
     gradeEBBR: string;

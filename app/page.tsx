@@ -31,10 +31,11 @@ export default function Home() {
   });
 
   const [examGrades, setExamGrades] = useState<ExamGrades>({
-    deutsch: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '112' },
+    deutsch: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '120' },
     mathematik: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '60' },
     fremdsprache: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '75' },
-    praesentation: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '35' },
+    praesentationSchriflich: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '75' },
+    praesentationMuendlich: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '75' },
   });
 
   const [gradeStats, setGradeStats] = useState<GradeStats>({
