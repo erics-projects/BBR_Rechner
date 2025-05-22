@@ -13,6 +13,9 @@ import {
     notenMatrix
 } from '../types/examCalculationVariables';
 export const convertExamPointsToGrade = (points: String, gradeMapping: { [key: number]: String }): string => {
+  if( points === '' ) {
+    return '';
+  }
   let pointsTmp = Number(points);
   for (const [threshold, grade] of Object.entries(gradeMapping).sort((a, b) => Number(b[0]) - Number(a[0]))) {
     if (pointsTmp >= Number(threshold)) {
@@ -39,18 +42,14 @@ function getPunktwert(note: string): number {
 
 // const as function to calculate the grade of presentation
 function calculatePresentation(schriftlich: string, muendlich: string): string {
-
-
-
   if (schriftlich === '' || muendlich === '') {
-    console.log('Schriftlich or Muendlich is undefined');
     return '';
+  }else if(schriftlich=== undefined || muendlich === undefined) {
+    return '';
+
   }else {
     const pS = getPunktwert(schriftlich);
     const pM = getPunktwert(muendlich);
-    console.log('IN THE CALCULATE PRESENTATION FUNCTION');
-    console.log('Schriftlich: ', pS);
-    console.log('Muendlich: ', pM);
     return notenMatrix[pS][pM];
   }
   return 'error';
@@ -66,8 +65,16 @@ export class ExamCalculator {
     const gradeDeutsch = examGrades.deutsch.points;
     const gradeMathe = examGrades.mathematik.points;
     const gradeFremdsprache = examGrades.fremdsprache.points;
-    const gradePraesentationSchriftlich = examGrades.praesentationSchriflich.points;
-    const gradePraesentationMuendlich = examGrades.praesentationMuendlich.points;
+    const gradePraesentationSchriftlich = examGrades.praesentation.pointsSchriftlich;
+    const gradePraesentationMuendlich = examGrades.praesentation.pointsMuendlich;
+
+    const praesentationSchrifttich_MSA = convertExamPointsToGrade(gradePraesentationSchriftlich, MSA_PraesentationGradeMappingSchritlich);
+    const praesentationMuendlich_MSA = convertExamPointsToGrade(gradePraesentationMuendlich, MSA_PraesentationGradeMappingMuendlich);
+    const presentationGradeMSA = calculatePresentation(praesentationSchrifttich_MSA, praesentationMuendlich_MSA);
+
+    const praesentationSchriftlich_EBBR = convertExamPointsToGrade(gradePraesentationSchriftlich, EBBR_PraesentationGradeMappingMuendlich);
+    const praesentationMuendlich_EBBR = convertExamPointsToGrade(gradePraesentationMuendlich, EBBR_PraesentationGradeMappingMuendlich);
+    const presentationGradeEBBR = calculatePresentation(praesentationSchriftlich_EBBR, praesentationMuendlich_EBBR);
 
     // change the points to grades
     // 1 point = 6; 2 points =5; 3 points = 4; 4 points = 3; 5 points = 2; 6 points = 1
@@ -90,17 +97,19 @@ export class ExamCalculator {
         gradeEBBR: gradeFremdsprache ? convertExamPointsToGrade( gradeFremdsprache, EBBR_fremdspracheGradeMapping).toString() : '',
         maxPoints: examGrades.fremdsprache.maxPoints
       },
-      praesentationSchriflich: {
-        points: gradePraesentationSchriftlich,
-        gradeMSA: gradePraesentationSchriftlich ? convertExamPointsToGrade( gradePraesentationSchriftlich, MSA_PraesentationGradeMappingSchritlich).toString() : '',
-        gradeEBBR: gradePraesentationSchriftlich ? convertExamPointsToGrade( gradePraesentationSchriftlich, EBBR_PraesentationGradeMappingSchrifltich).toString() : '',
-        maxPoints: examGrades.fremdsprache.maxPoints
-      },
-       praesentationMuendlich: {
-         points: gradePraesentationMuendlich,
+      // praesentationSchriflich: {
+      //   points: gradePraesentationSchriftlich,
+      //   gradeMSA: gradePraesentationSchriftlich ? convertExamPointsToGrade( gradePraesentationSchriftlich, MSA_PraesentationGradeMappingSchritlich).toString() : '',
+      //   gradeEBBR: gradePraesentationSchriftlich ? convertExamPointsToGrade( gradePraesentationSchriftlich, EBBR_PraesentationGradeMappingSchrifltich).toString() : '',
+      //   maxPoints: examGrades.praesentation.maxPointsSchriftlich
+      // },
+       praesentation: {
+         pointsSchriftlich: gradePraesentationSchriftlich,
+         pointsMuendlich: gradePraesentationMuendlich,
          gradeMSA: gradePraesentationMuendlich ? convertExamPointsToGrade( gradePraesentationMuendlich, MSA_PraesentationGradeMappingMuendlich).toString() : '',
          gradeEBBR: gradePraesentationMuendlich ? convertExamPointsToGrade( gradePraesentationMuendlich, EBBR_PraesentationGradeMappingMuendlich).toString() : '',
-         maxPoints: examGrades.fremdsprache.maxPoints
+         maxPointsSchriftlich: examGrades.praesentation.maxPointsSchriftlich,
+         maxPointsMuendlich: examGrades.praesentation.maxPointsMuendlich,
        }
     };
     // return the calculated grades
@@ -146,12 +155,17 @@ export class ExamCalculator {
   }
 
   //calculate if student passed the exams
-    public static calculateExamStatus(examGrades: ExamGrades): { msaPassed: boolean; ebbrPassed: boolean; presentationGrade: string } {
+    public static calculateExamStatus(examGrades: ExamGrades): { msaPassed: boolean; ebbrPassed: boolean; presentationGrade_MSA: string; presentationGrade_EBBR: string } {
         let msaPassed = true;
         let ebbrPassed = true;
-        const praesentationSchrifltich = convertExamPointsToGrade(examGrades.praesentationSchriflich.points, MSA_PraesentationGradeMappingSchritlich);
-        const praesentationMuendlich = convertExamPointsToGrade(examGrades.praesentationMuendlich.points, MSA_PraesentationGradeMappingMuendlich);
-        const presentationGrade = calculatePresentation(praesentationSchrifltich, praesentationMuendlich);
+
+      const praesentationSchrifltich_MSA = convertExamPointsToGrade(examGrades.praesentation.pointsSchriftlich, MSA_PraesentationGradeMappingSchritlich);
+      const praesentationMuendlich_MSA = convertExamPointsToGrade(examGrades.praesentation.pointsMuendlich, MSA_PraesentationGradeMappingMuendlich);
+      const presentationGrade_MSA = calculatePresentation(praesentationSchrifltich_MSA, praesentationMuendlich_MSA);
+
+      const praesentationSchrifltich_EBBR = convertExamPointsToGrade(examGrades.praesentation.pointsSchriftlich, MSA_PraesentationGradeMappingSchritlich);
+      const praesentationMuendlich_EBBR = convertExamPointsToGrade(examGrades.praesentation.pointsMuendlich, MSA_PraesentationGradeMappingMuendlich);
+      const presentationGrade_EBBR = calculatePresentation(praesentationSchrifltich_EBBR, praesentationMuendlich_EBBR);
 
         // variable for all gradeMSA and gradeEBBR stored in array
         const msaGrades = Object.values(examGrades).map(subject => subject.gradeMSA);
@@ -161,7 +175,7 @@ export class ExamCalculator {
         msaPassed = this.calculateExam(msaGrades);
         ebbrPassed = this.calculateExam(ebbrGrades);
 
-      return { msaPassed, ebbrPassed, presentationGrade };
+      return { msaPassed, ebbrPassed, presentationGrade_MSA, presentationGrade_EBBR };
     }
 
 }
