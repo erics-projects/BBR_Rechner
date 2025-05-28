@@ -1,49 +1,37 @@
 export const MSA_deutschGradeMapping = {  112: '1',  100: '2',  88:  '3',  72:  '4',  36:  '5' };
 export const MSA_matheGradeMapping = { 56: '1',  45: '2',  38: '3',  30: '4',  9:  '5', };
-export const MSA_fremdspracheGradeMapping = {
+export const MSA_praesentationGradeMapping = { 30: '1',  24: '2',  18: '3',  12: '4',  3:  '5', };
+export const MSA_fremdspracheGradeMappingSchritlich = {
     74: `1+`, 72: '1', 70: '1-',
     68: '2+', 65: '2', 63: '2-',
     61: '3+', 57: '3', 55: '3-',
     53: '4+', 47: '4', 45: '4-',
     43: '5+', 25: '5', 23: '5-'
 };
-export const MSA_PraesentationGradeMappingSchritlich = {
-    15: '1+',  14: '1',  13: '1-',
-    12: '2+',  11: '2',  10: '2-',
-    9: '3+',  8: '3',  7: '3-',
-    6: '4+',  5: '4',  4: '4-',
-    3: '5+',  2: '5',  1: '5-',
-};
-export const MSA_PraesentationGradeMappingMuendlich = {
-    15: '1+',  14: '1',  13: '1-',
-    12: '2+',  11: '2',  10: '2-',
-    9: '3+',  8: '3',  7: '3-',
-    6: '4+',  5: '4',  4: '4-',
-    3: '5+',  2: '5',  1: '5-',
+export const MSA_fremdspracheGradeMappingMuendlich = {
+    73: '1+',  68: '1',  63: '1-',
+    58: '2+',  53: '2',  48: '2-',
+    43: '3+',  38: '3',  33: '3-',
+    28: '4+',  23: '4',  18: '4-',
+    13: '5+',  8: '5',  3: '5-',
 };
 
 //EBBR Mapping
 export const EBBR_deutschGradeMapping = {   84: '1',  72: '2',  59: '3',  45: '4',  23: '5',};
 export const EBBR_matheGradeMapping = {  37: '1',  30: '2',  24: '3',  18: '4',  6:  '5', };
-export const EBBR_fremdspracheGradeMapping = {
+export const EBBR_praesentationGradeMapping = { 24: '1',  18: '2',  12: '3',  3: '4',  1:  '5', };
+export const EBBR_fremdspracheGradeMappingSchriftlich =  {
     50: '1+',  48: '1',  47: '1-',
     45: '2+',  43: '2',  41: '2-',
     39: '3+',  35: '3',  33: '3-',
     31: '4+',  27: '4',  25: '4-',
     23: '5+',  15: '5',  13: '5-',
 };
-export const EBBR_PraesentationGradeMappingSchrifltich =  {
-    15: '1+',  14: '1',  13: '1-',
-    12: '2+',  11: '2',  10: '2-',
-    9: '3+',  8: '3',  7: '3-',
-    6: '4+',  5: '4',  4: '4-',
-    3: '5+',  2: '5',  1: '5-',
-};
-export const EBBR_PraesentationGradeMappingMuendlich = {
-    15: '1+',  14: '1',  13: '1-',
-    12: '2+',  11: '2',  10: '2-',
-    9: '3+',  8: '3',  7: '3-',
-    6: '4+',  5: '4',  4: '4-',
+export const EBBR_fremdspracheGradeMappingMuendlich = {
+    58: '1+',  53: '1',  48: '1-',
+    43: '2+',  38: '2',  33: '2-',
+    28: '3+',  23: '3',  18: '3-',
+    13: '4+',  8: '4',  4: '4-',
     3: '5+',  2: '5',  1: '5-',
 };
 
