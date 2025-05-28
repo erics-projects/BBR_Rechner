@@ -10,7 +10,7 @@ interface ExamGradeInputProps {
   // onCalculate: () => void;
 }
 
-export function ExamGradeInput({ examGrades, onInputChange, onCalculate }: ExamGradeInputProps) {
+export function ExamGradeInput({ examGrades, onInputChange }: ExamGradeInputProps) {
   const displayNames = {
     deutsch: 'Deutsch',
     mathematik: 'Mathematik',
@@ -26,7 +26,7 @@ export function ExamGradeInput({ examGrades, onInputChange, onCalculate }: ExamG
         <h2 className="text-lg font-semibold">Prüfungen</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {Object.entries(examGrades)
-              .filter(([field, _]: [string, any]) => field !== 'praesentation') // Skip 'praesentation'
+              .filter(([field, _]: [string, any]) => field !== 'fremdsprache') // Skip 'Fremdsprache'
               .map(([field, value]) => (
               <div key={field} className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
@@ -35,7 +35,7 @@ export function ExamGradeInput({ examGrades, onInputChange, onCalculate }: ExamG
                   </label>
                 </div>
                 <div className="flex gap-4 items-start">
-                  {field === 'praesentation' ? (
+                  {field === 'fremdsprache' ? (
                       <>
                       </>
                   ) : (

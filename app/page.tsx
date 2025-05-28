@@ -1,14 +1,20 @@
 'use client';
-import Image from "next/image";
-import { useState, useEffect } from "react";
-import { GradeInput } from "./components/GradeInput";
-import { ResultsDisplayGrades } from "./components/ResultsDisplayGrades";
-import { ResultsDisplayExam } from "./components/ResultsDisplayExam";
-import { ExamGradeInput } from "./components/ExamGradeInput";
-import { GradeCalculator } from "./services/gradeCalculator";
-import { ExamCalculator } from "./services/examCalculator";
-import { ExamPresentationInput } from './components/ExamPresentationInput';
-import { AllGradeInputs, GradeStats, ExamGrades, GradeWithLevel, convertPointsToGrade, convertPointsToGradeG} from "./types/grades";
+import {useState} from "react";
+import {GradeInput} from "./components/GradeInput";
+import {ResultsDisplayGrades} from "./components/ResultsDisplayGrades";
+import {ResultsDisplayExam} from "./components/ResultsDisplayExam";
+import {ExamGradeInput} from "./components/ExamGradeInput";
+import {GradeCalculator} from "./services/gradeCalculator";
+import {ExamCalculator} from "./services/examCalculator";
+import {ExamFremdspracheInput} from './components/ExamFremdspracheInput';
+import {
+  AllGradeInputs,
+  convertPointsToGrade,
+  convertPointsToGradeG,
+  ExamGrades,
+  GradeStats,
+  GradeWithLevel
+} from "./types/grades";
 
 export default function Home() {
   const [grades, setGrades] = useState<AllGradeInputs>({
@@ -34,14 +40,18 @@ export default function Home() {
   const [examGrades, setExamGrades] = useState<ExamGrades>({
     deutsch: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '120' },
     mathematik: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '60' },
-    fremdsprache: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '75' },
-    praesentation: {pointsSchriftlich: '',
+    fremdsprache: {pointsSchriftlich: '',
       pointsMuendlich: '',
+      gradeSchriftlich_MSA: '',
+      gradeMuendlich_MSA: '',
+      gradeSchriftlich_eBBR: '',
+      gradeMuendlich_eBBR: '',
       gradeMSA: '',
       gradeEBBR:  '',
-      maxPointsSchriftlich:  '15',
-      maxPointsMuendlich:  '15',
+      maxPointsSchriftlich:  '75',
+      maxPointsMuendlich:  '75',
     },
+    praesentation: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '35' },
     // praesentationSchriflich: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '15' },
     // praesentationMuendlich: { points: '', gradeMSA: '', gradeEBBR: '', maxPoints: '15' },
   });
@@ -113,16 +123,29 @@ export default function Home() {
       });
     };
 
-  const handleExamPresentationInputChange = (field: keyof ExamGrades, subField?: 'pointsSchriftlich' | 'pointsMuendlich') =>
+  const handleExamFremdspracheInputChange = (field: keyof ExamGrades, subField?: "pointsSchriftlich" | "pointsMuendlich") =>
       (e: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = e.target;
         setExamGrades((prev) => ({
           ...prev,
           [field]: subField
-              ? { ...prev[field], [subField]: value } // Update subfield for `praesentation`
+              ? { ...prev[field], [subField]: value } // Update subfield for `fremdsprache`
               : { ...prev[field], points: value },   // Update other fields
         }));
+        // create ExamGrades variable to hold the recalculated grades
+        // and call the calculateExamGrades function
+        setExamGrades(prev => {
+          const updatedExamGrades = {
+            ...prev,
+            [field]: {
+              ...prev[field],
+              value
+            }
+          };
+          return ExamCalculator.calculateExamGrades(updatedExamGrades);
+        });
       };
+
   const handleExamInputChange = (field: keyof ExamGrades) =>
       (e: React.ChangeEvent<HTMLInputElement>) => {
         const points = e.target.value;
@@ -200,14 +223,21 @@ export default function Home() {
             examGrades={examGrades}
             onInputChange={handleExamInputChange}
         />
-        <ExamPresentationInput
+
+        <ExamFremdspracheInput
             value={{
-              pointsSchriftlich: examGrades.praesentation.pointsSchriftlich,
-              pointsMuendlich: examGrades.praesentation.pointsMuendlich,
-              maxPointsSchriftlich: examGrades.praesentation.maxPointsSchriftlich,
-              maxPointsMuendlich: examGrades.praesentation.maxPointsMuendlich,
+              pointsSchriftlich: examGrades.fremdsprache.pointsSchriftlich,
+              pointsMuendlich: examGrades.fremdsprache.pointsMuendlich,
+              gradeSchriftlich_MSA: examGrades.fremdsprache.gradeSchriftlich_MSA,
+              gradeMuendlich_MSA: examGrades.fremdsprache.gradeMuendlich_MSA,
+              gradeSchriftlich_eBBR: examGrades.fremdsprache.gradeSchriftlich_eBBR,
+              gradeMuendlich_eBBR: examGrades.fremdsprache.gradeMuendlich_eBBR,
+              gradeMSA: examGrades.fremdsprache.gradeMSA,
+              gradeEBBR: examGrades.fremdsprache.gradeEBBR,
+              maxPointsSchriftlich: examGrades.fremdsprache.maxPointsSchriftlich,
+              maxPointsMuendlich: examGrades.fremdsprache.maxPointsMuendlich,
             }}
-            onInputChange={(subField) => handleExamPresentationInputChange('praesentation', subField)}
+            onInputChange={handleExamFremdspracheInputChange}
         />
         <button
             className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"

@@ -22,18 +22,22 @@ export interface ExamGrades {
     maxPoints: string;
   };
   fremdsprache: {
-    points: string;
-    gradeMSA: string;
-    gradeEBBR: string;
-    maxPoints: string;
-  };
-  praesentation: {
     pointsSchriftlich: string;
     pointsMuendlich:string;
+    gradeSchriftlich_MSA: string;
+    gradeMuendlich_MSA: string;
+    gradeSchriftlich_eBBR: string;
+    gradeMuendlich_eBBR: string;
     gradeMSA: string;
     gradeEBBR: string;
     maxPointsSchriftlich: string;
     maxPointsMuendlich: string;
+  };
+  praesentation: {
+    points: string;
+    gradeMSA: string;
+    gradeEBBR: string;
+    maxPoints: string;
   };
   // praesentationSchriflich: {
   //   points: string;

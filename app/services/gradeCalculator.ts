@@ -490,7 +490,6 @@ export class GradeCalculator {
     if (totalELevel >= 2) {
     // Check E-Level requirements for MSA Gymnasiale Oberstufe -> min 2 E-Kurse in Kernfächer und min 1 E-Kurs in Fächer
       if (kernfaecherELevel < 2 || faecherELevel < 1) {
-        console.log('weniger E Faecher in Kernfaecher oder Faecher > 2');
       return {
         msaPassed: true,
         msaStatus: 'MSA: Bestanden',
@@ -512,10 +511,8 @@ export class GradeCalculator {
         msaStatus: 'MSA: Bestanden',
       };
     }
-    console.log(this.countGradesByValue(allGrades, 5) >= 2);
     // Check if there are more than two 5s in total than MSA GO is not passed MSA is still passed
     if (this.countGradesByValue(allGrades, 5) > 2) {
-      console.log('mehr als 2 5er');
       return {
         msaPassed: true,
         msaStatus: 'MSA: Bestanden',
@@ -569,7 +566,6 @@ export class GradeCalculator {
       // Check if there are more than two 5s in total than MSA GO is not passed MSA is still passed
      
       else if (this.countGradesByValue(allGrades, 5) >= 2) {
-        console.log('mehr als 2 5er');
         return {
           averageE: averageE,
           uebergangGymnasialeOberstufe: false,
