@@ -48,7 +48,7 @@ export function ExamFremdspracheInput({ value, onInputChange }: ExamFremdsprache
                                 </div>
                             )}
                         </div>
-                        <div className="w-1/3 sm:w-24">
+                        <div className="w-1/hotfix3 sm:w-24">
                             <input
                                 type="number"
                                 min="0"
@@ -60,7 +60,7 @@ export function ExamFremdspracheInput({ value, onInputChange }: ExamFremdsprache
                                 placeholder={`0-${value.maxPointsMuendlich}`}
                             />
                             <span className="text-sm">Mündlich</span>
-                            {value.pointsSchriftlich !== '' && (
+                            {value.pointsMuendlich !== '' && (
                                 <div className="mt-0 text-xs flex flex-col">
                                     <span>eBBR: {value.gradeMuendlich_eBBR} |  MSA: {value.gradeMuendlich_MSA}</span>
                                 </div>
