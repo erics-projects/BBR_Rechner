@@ -89,7 +89,7 @@ export interface FaecherInputs {
   musik: GradeWithLevel;
   kunst: GradeWithLevel;
   sport: GradeWithLevel;
-  französich: GradeWithLevel;
+  franzoesisch: GradeWithLevel;
 }
 
 export interface AllGradeInputs {

@@ -22,7 +22,7 @@ export function GradeInput({ grades, onInputChange, onLevelChange }: GradeInputP
       musik: 'Musik',
       kunst: 'Kunst',
       sport: 'Sport',
-      französich: 'Französisch'
+      franzoesisch: 'Französisch'
     }
   };
 
