@@ -33,7 +33,7 @@ export default function Home() {
       musik: { points: '', gradeE: '', gradeG: '', level: 'M' },
       kunst: { points: '', gradeE: '', gradeG: '', level: 'M' },
       sport: { points: '', gradeE: '', gradeG: '', level: 'M' },
-      französich: { points: '', gradeE: '', gradeG: '', level: 'M' }
+      franzoesisch: { points: '', gradeE: '', gradeG: '', level: 'M' }
     }
   });
 
@@ -73,7 +73,6 @@ export default function Home() {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const points = e.target.value;
       setGrades(prev => {
-        const currentGrade = prev[category][subject as keyof typeof prev[typeof category]] as GradeWithLevel;
         const gradeE = points ? convertPointsToGrade(Number(points)).toString() : '';
         const gradeG = points ? convertPointsToGradeG(Number(points)).toString() : '';
         
@@ -160,9 +159,8 @@ export default function Home() {
           };
 
           // Recalculate grades based on updated points
-          const recalculatedGrades = ExamCalculator.calculateExamGrades(updatedExamGrades);
+          return ExamCalculator.calculateExamGrades(updatedExamGrades);
 
-          return recalculatedGrades;
         });
       };
 
@@ -190,7 +188,7 @@ export default function Home() {
             Abschlussrechner
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400">
-            erweiterte Berufsbildungsreife (eBBR) und MSA Notenrechner für Berlin
+            für BBR, erweiterte Berufsbildungsreife (eBBR), MSA und MSA(GO) Notenrechner für Berlin.
           </p>
 
           <a
@@ -199,7 +197,7 @@ export default function Home() {
               rel="noopener noreferrer"
               className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
           >
-            Alle Informationen finden Sie hier: berlin.de/...
+            Die offiziellen Informationen finden Sie hier: berlin.de/...
           </a>
         </div>
 
@@ -246,12 +244,7 @@ export default function Home() {
           Testen
         </button>
         {showExamResults && <ResultsDisplayExam examGrades={examGrades}/>}
-        {/*<ResultsDisplayExam examGrades={examGrades} />*/}
-        {/*{examResult && (
-          <div className={`font-medium mt-4 ${examResult.includes('bestanden') && !examResult.includes('nicht') ? 'text-green-400' : 'text-red-400'}`}>
-            Prüfungen: {examResult}
-          </div>
-        )}*/}
+
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
         <p className="text-sm text-center text-foreground">
