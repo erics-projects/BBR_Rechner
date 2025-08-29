@@ -154,9 +154,10 @@ export class ExamCalculator {
   }
 
   //calculate if student passed the exams
-    public static calculateExamStatus(examGrades: ExamGrades): { msaPassed: boolean; ebbrPassed: boolean; fremdspracheGrade_MSA: string; fremdspracheGrade_EBBR: string } {
+    public static calculateExamStatus(examGrades: ExamGrades): { msaPassed: boolean; ebbrPassed: boolean; bbrPassed: boolean; fremdspracheGrade_MSA: string; fremdspracheGrade_EBBR: string} {
         let msaPassed = true;
         let ebbrPassed = true;
+        let bbrPassed = false;
 
       const fremdspracheSchrifltich_MSA = convertExamPointsToGrade(examGrades.fremdsprache.pointsSchriftlich, MSA_fremdspracheGradeMappingSchritlich);
       const fremdspracheMuendlich_MSA = convertExamPointsToGrade(examGrades.fremdsprache.pointsMuendlich, MSA_fremdspracheGradeMappingMuendlich);
@@ -170,11 +171,22 @@ export class ExamCalculator {
         const msaGrades = Object.values(examGrades).map(subject => subject.gradeMSA);
         const ebbrGrades = Object.values(examGrades).map(subject => subject.gradeEBBR);
 
+        // check bbr passed
+        // if one of the grades is 5 or 6, bbr is not passed
+      console.log(ebbrGrades)
+      for (const grade of ebbrGrades) {
+          if (grade === '1' || grade === '2' || grade === '3' || grade === '4') {
+            bbrPassed = true;
+            console.log("Note: ", grade)
+            break;
+          }
+        }
+
         // MSA Check
         msaPassed = this.calculateExam(msaGrades);
         ebbrPassed = this.calculateExam(ebbrGrades);
 
-      return { msaPassed, ebbrPassed, fremdspracheGrade_MSA, fremdspracheGrade_EBBR };
+      return { msaPassed, ebbrPassed, bbrPassed, fremdspracheGrade_MSA, fremdspracheGrade_EBBR };
     }
 
 }
