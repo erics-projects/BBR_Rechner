@@ -24,14 +24,7 @@ export function ExamGradeInput({ examGrades, onInputChange }: ExamGradeInputProp
     <div className="flex flex-col gap-6 w-full max-w-4xl">
       <div className="space-y-4">
         <h2 className="text-lg font-semibold">Prüfungen</h2>
-        <span className={"m-px"}>
-        <a className={"text-sm"}>Du bestehst den Prüfungsteil, für MSA und eBBR, wenn du in allen Prüfungen 4 oder besser
-          bist. <br/>
-          - Eine 5 kann mit einer 3 oder besser ausgleichen werden <br/>
-          - Zwei 5en oder eine 6 ist durchgefallen
-        </a>
-        <p className={"text-sm"}></p>
-          </span>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {Object.entries(examGrades)
               .filter(([field, _]: [string, any]) => field !== 'fremdsprache') // Skip 'Fremdsprache'
