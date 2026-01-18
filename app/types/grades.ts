@@ -90,6 +90,7 @@ export interface FaecherInputs {
   kunst: GradeWithLevel;
   sport: GradeWithLevel;
   franzoesisch: GradeWithLevel;
+  wpu: GradeWithLevel;
 }
 
 export interface AllGradeInputs {
