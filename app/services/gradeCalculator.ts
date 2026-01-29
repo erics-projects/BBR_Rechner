@@ -1,4 +1,4 @@
-import { AllGradeInputs, GradeWithLevel, GradeStats } from '../types/grades';
+import { AllGradeInputs, GradeStats } from '../types/grades';
 
 export class GradeCalculator {
   private static countGradesByValue(grades: number[], value: number): number {
@@ -159,16 +159,16 @@ export class GradeCalculator {
     return null;
   }
 
-  private static countELevelGrades(grades: AllGradeInputs): {
+  private static countELevelGrades(grades: AllGradeInputs, minNote: number): {
     kernfaecherELevel: number;
     faecherELevel: number;
   } {
     const kernfaecherELevel = Object.values(grades.kernfaecher)
-      .filter(g => g.level === 'E' && g.gradeE && parseInt(g.gradeE) <= 3)
+      .filter(g => g.level === 'E' && g.gradeE && parseInt(g.gradeE) <= minNote)
       .length;
     
     const faecherELevel = Object.values(grades.faecher)
-      .filter(g => g.level === 'E' && g.gradeE && parseInt(g.gradeE) <= 3)
+      .filter(g => g.level === 'E' && g.gradeE && parseInt(g.gradeE) <= minNote)
       .length;
 
     return { kernfaecherELevel, faecherELevel };
@@ -484,21 +484,18 @@ export class GradeCalculator {
     }
 
     // Check E-Level requirements
-    const { kernfaecherELevel, faecherELevel } = this.countELevelGrades(grades);
+    const { kernfaecherELevel, faecherELevel } = this.countELevelGrades(grades,6 );
     const totalELevel = kernfaecherELevel + faecherELevel;
 
     if (totalELevel >= 2) {
-    // Check E-Level requirements for MSA Gymnasiale Oberstufe -> min 2 E-Kurse in Kernfächer und min 1 E-Kurs in Fächer
-      if (kernfaecherELevel < 2 || faecherELevel < 1) {
       return {
         msaPassed: true,
         msaStatus: 'MSA: Bestanden',
       };
-    }
     }else  {
       return {
         msaPassed: false,
-        msaStatus: 'MSA: Nicht bestanden, weniger als 2 E-Kurse mit Note 3 oder besser',
+        msaStatus: 'MSA: Nicht bestanden, weniger als 2 E-Kurse',
       };
     }    
 
@@ -556,11 +553,11 @@ export class GradeCalculator {
         };
       }
       //chek if there are at least 2 E-Kurse in Kernfächer and at least 1 E-Kurs in Fächer
-    else if (this.countELevelGrades(grades).kernfaecherELevel < 2 || this.countELevelGrades(grades).faecherELevel < 1) {
+    else if (this.countELevelGrades(grades, 3).kernfaecherELevel < 2 || this.countELevelGrades(grades, 3).faecherELevel < 1) {
       return {
         averageE: averageE,
         uebergangGymnasialeOberstufe: false,
-        uebergangReason: 'MSAgo: Nein, weniger als 2 E-Kurse in Kernfächer und 1 E-Kurs in Fächer',
+        uebergangReason: 'MSAgo: Nicht bestanden, weniger als 2 E-Kurse in Kernfächer und 1 E-Kurs in Fächer mit Note 3 oder besser',
       };
     }
       // Check if there are more than two 5s in total than MSA GO is not passed MSA is still passed
@@ -569,14 +566,14 @@ export class GradeCalculator {
         return {
           averageE: averageE,
           uebergangGymnasialeOberstufe: false,
-          uebergangReason: 'MSAgo: Nein, mehr als eine 5 insgesamt',
+          uebergangReason: 'MSAgo: Nicht bestanden, mehr als eine 5 insgesamt',
         } 
         //check if there are more than one 6 in total than MSA GO 
     } else if (this.countGradesByValue(allGrades, 6) > 0) {
       return {
         averageE: averageE,
         uebergangGymnasialeOberstufe: false,
-        uebergangReason: 'MSAgo: Nein, eine 6',
+        uebergangReason: 'MSAgo: Nicht bestanden, eine 6',
       };
     }
     
@@ -594,7 +591,7 @@ export class GradeCalculator {
       return {
         averageE: averageE,
         uebergangGymnasialeOberstufe: false,
-        uebergangReason: 'MSAgo: Nein, MSA nicht bestanden',
+        uebergangReason: 'MSAgo: Nicht bestanden, MSA nicht bestanden',
       };
     }
   }
