@@ -164,7 +164,7 @@ export class GradeCalculator {
     faecherELevel: number;
   } {
     const kernfaecherELevel = Object.values(grades.kernfaecher)
-      .filter(g => g.level === 'E' && g.gradeE && parseInt(g.gradeE) <= 6)
+      .filter(g => g.level === 'E' && g.gradeE && parseInt(g.gradeE) <=6)
       .length;
     
     const faecherELevel = Object.values(grades.faecher)
@@ -489,16 +489,16 @@ export class GradeCalculator {
 
     if (totalELevel >= 2) {
     // Check E-Level requirements for MSA Gymnasiale Oberstufe -> min 2 E-Kurse in Kernfächer und min 1 E-Kurs in Fächer
-      if (kernfaecherELevel < 2 || faecherELevel < 1) {
+      //if (kernfaecherELevel < 2 || faecherELevel < 1) {
       return {
         msaPassed: true,
         msaStatus: 'MSA: Bestanden',
       };
-    }
+    //}
     }else  {
       return {
         msaPassed: false,
-        msaStatus: 'MSA: Nicht bestanden, weniger als 2 E-Kurse mit Note 3 oder besser',
+        msaStatus: 'MSA: Nicht bestanden, weniger als 2 E-Kurse',
       };
     }    
 
