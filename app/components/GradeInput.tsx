@@ -10,7 +10,7 @@ export function GradeInput({ grades, onInputChange, onLevelChange }: GradeInputP
     kernfaecher: {
       deutsch: 'Deutsch',
       mathe: 'Mathematik',
-      ersteFremdsprache: 'Erste Fremdsprache'
+      ersteFremdsprache: 'Erste Fremdsprache schriftlich'
     },
     faecher: {
       wAT: 'WAT (Wirtschaft Arbeit Technik)',
@@ -22,8 +22,7 @@ export function GradeInput({ grades, onInputChange, onLevelChange }: GradeInputP
       musik: 'Musik',
       kunst: 'Kunst',
       sport: 'Sport',
-      franzoesisch: 'Französisch',
-      wpu: 'WPU (Wahlpflichtunterricht)'
+      franzoesisch: 'Französisch'
     }
   };
 

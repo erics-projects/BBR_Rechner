@@ -33,8 +33,7 @@ export default function Home() {
       musik: { points: '', gradeE: '', gradeG: '', level: 'M' },
       kunst: { points: '', gradeE: '', gradeG: '', level: 'M' },
       sport: { points: '', gradeE: '', gradeG: '', level: 'M' },
-      franzoesisch: { points: '', gradeE: '', gradeG: '', level: 'M' },
-      wpu: { points: '', gradeE: '', gradeG: '', level: 'M' }
+      franzoesisch: { points: '', gradeE: '', gradeG: '', level: 'M' }
     }
   });
 

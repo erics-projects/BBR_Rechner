@@ -14,7 +14,7 @@ export function ExamGradeInput({ examGrades, onInputChange }: ExamGradeInputProp
   const displayNames = {
     deutsch: 'Deutsch',
     mathematik: 'Mathematik',
-    fremdsprache: 'Erste Fremdsprache',
+    fremdsprache: 'Erste Fremdsprache schriftlich',
     praesentation: 'Präsentation',
     // praesentationSchriflich: 'Präsentation schriftlich',
     // praesentationMuendlich: 'Präsentation mündlich',
