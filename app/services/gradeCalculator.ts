@@ -174,6 +174,21 @@ export class GradeCalculator {
     return { kernfaecherELevel, faecherELevel };
   }
 
+  private static countELevelGradesGo(grades: AllGradeInputs): {
+    kernfaecherELevel: number;
+    faecherELevel: number;
+  } {
+    const kernfaecherELevel = Object.values(grades.kernfaecher)
+        .filter(g => g.level === 'E' && g.gradeE && parseInt(g.gradeE) <= 3)
+        .length;
+
+    const faecherELevel = Object.values(grades.faecher)
+        .filter(g => g.level === 'E' && g.gradeE && parseInt(g.gradeE) <= 3)
+        .length;
+
+    return { kernfaecherELevel, faecherELevel };
+  }
+
   // private static checkUebergangGymnasialeOberstufe(
   //   grades: AllGradeInputs,
   //   averageE: number
@@ -561,7 +576,7 @@ export class GradeCalculator {
       };
     }
       // Check if there are more than two 5s in total than MSA GO is not passed MSA is still passed
-     
+
       else if (this.countGradesByValue(allGrades, 5) >= 2) {
         return {
           averageE: averageE,
@@ -576,14 +591,14 @@ export class GradeCalculator {
         uebergangReason: 'MSAgo: Nicht bestanden, eine 6',
       };
     }
-    
-    
-    else { 
+
+
+    else {
         return {
         averageE: averageE,
         uebergangGymnasialeOberstufe: true,
         uebergangReason: 'MSAgo: Bestanden',
-      }; 
+      };
     }
   }
 
