@@ -164,7 +164,7 @@ export class GradeCalculator {
     faecherELevel: number;
   } {
     const kernfaecherELevel = Object.values(grades.kernfaecher)
-      .filter(g => g.level === 'E' && g.gradeE && parseInt(g.gradeE) <=6)
+      .filter(g => g.level === 'E' && g.gradeE && parseInt(g.gradeE) <= 6)
       .length;
     
     const faecherELevel = Object.values(grades.faecher)
@@ -173,12 +173,13 @@ export class GradeCalculator {
 
     return { kernfaecherELevel, faecherELevel };
   }
+
   private static countELevelGradesGo(grades: AllGradeInputs): {
     kernfaecherELevel: number;
     faecherELevel: number;
   } {
     const kernfaecherELevel = Object.values(grades.kernfaecher)
-        .filter(g => g.level === 'E' && g.gradeE && parseInt(g.gradeE) <=3)
+        .filter(g => g.level === 'E' && g.gradeE && parseInt(g.gradeE) <= 3)
         .length;
 
     const faecherELevel = Object.values(grades.faecher)
@@ -503,16 +504,16 @@ export class GradeCalculator {
 
     if (totalELevel >= 2) {
     // Check E-Level requirements for MSA Gymnasiale Oberstufe -> min 2 E-Kurse in Kernfächer und min 1 E-Kurs in Fächer
-      //if (kernfaecherELevel < 2 || faecherELevel < 1) {
+      if (kernfaecherELevel < 2 || faecherELevel < 1) {
       return {
         msaPassed: true,
         msaStatus: 'MSA: Bestanden',
       };
-    //}
+    }
     }else  {
       return {
         msaPassed: false,
-        msaStatus: 'MSA: Nicht bestanden, weniger als 2 E-Kurse',
+        msaStatus: 'MSA: Nicht bestanden, weniger als 2 E-Kurse mit Note 3 oder besser',
       };
     }    
 
@@ -569,9 +570,8 @@ export class GradeCalculator {
           uebergangReason: 'MSAgo: Notendurchschnitt schlechter als 3,0',
         };
       }
-      //check if there are at least 2 E-Kurse in Kernfächer and at least 1 E-Kurs in Fächer
+      //chek if there are at least 2 E-Kurse in Kernfächer and at least 1 E-Kurs in Fächer
     else if (this.countELevelGradesGo(grades).kernfaecherELevel < 2 || this.countELevelGradesGo(grades).faecherELevel < 1) {
-
       return {
         averageE: averageE,
         uebergangGymnasialeOberstufe: false,
@@ -603,6 +603,14 @@ export class GradeCalculator {
         uebergangReason: 'MSAgo: Bestanden',
       };
     }
+  }
+
+    else{
+      return {
+        averageE: averageE,
+        uebergangGymnasialeOberstufe: false,
+        uebergangReason: 'MSAgo: Nein, MSA nicht bestanden',
+      };
     }
   }
 
