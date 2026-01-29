@@ -164,11 +164,11 @@ export class GradeCalculator {
     faecherELevel: number;
   } {
     const kernfaecherELevel = Object.values(grades.kernfaecher)
-      .filter(g => g.level === 'E' && g.gradeE && parseInt(g.gradeE) <= 3)
+      .filter(g => g.level === 'E' && g.gradeE && parseInt(g.gradeE) <= 6)
       .length;
     
     const faecherELevel = Object.values(grades.faecher)
-      .filter(g => g.level === 'E' && g.gradeE && parseInt(g.gradeE) <= 3)
+      .filter(g => g.level === 'E' && g.gradeE && parseInt(g.gradeE) <= 6)
       .length;
 
     return { kernfaecherELevel, faecherELevel };
