@@ -173,6 +173,20 @@ export class GradeCalculator {
 
     return { kernfaecherELevel, faecherELevel };
   }
+  private static countELevelGradesGo(grades: AllGradeInputs): {
+    kernfaecherELevel: number;
+    faecherELevel: number;
+  } {
+    const kernfaecherELevel = Object.values(grades.kernfaecher)
+        .filter(g => g.level === 'E' && g.gradeE && parseInt(g.gradeE) <=3)
+        .length;
+
+    const faecherELevel = Object.values(grades.faecher)
+        .filter(g => g.level === 'E' && g.gradeE && parseInt(g.gradeE) <= 3)
+        .length;
+
+    return { kernfaecherELevel, faecherELevel };
+  }
 
   // private static checkUebergangGymnasialeOberstufe(
   //   grades: AllGradeInputs,
@@ -555,8 +569,9 @@ export class GradeCalculator {
           uebergangReason: 'MSAgo: Notendurchschnitt schlechter als 3,0',
         };
       }
-      //chek if there are at least 2 E-Kurse in Kernfächer and at least 1 E-Kurs in Fächer
-    else if (this.countELevelGrades(grades).kernfaecherELevel < 2 || this.countELevelGrades(grades).faecherELevel < 1) {
+      //check if there are at least 2 E-Kurse in Kernfächer and at least 1 E-Kurs in Fächer
+    else if (this.countELevelGradesGo(grades).kernfaecherELevel < 2 || this.countELevelGradesGo(grades).faecherELevel < 1) {
+
       return {
         averageE: averageE,
         uebergangGymnasialeOberstufe: false,
@@ -564,13 +579,13 @@ export class GradeCalculator {
       };
     }
       // Check if there are more than two 5s in total than MSA GO is not passed MSA is still passed
-     
+
       else if (this.countGradesByValue(allGrades, 5) >= 2) {
         return {
           averageE: averageE,
           uebergangGymnasialeOberstufe: false,
           uebergangReason: 'MSAgo: Nein, mehr als eine 5 insgesamt',
-        } 
+        }
         //check if there are more than one 6 in total than MSA GO 
     } else if (this.countGradesByValue(allGrades, 6) > 0) {
       return {
@@ -579,23 +594,15 @@ export class GradeCalculator {
         uebergangReason: 'MSAgo: Nein, eine 6',
       };
     }
-    
-    
-    else { 
+
+
+    else {
         return {
         averageE: averageE,
         uebergangGymnasialeOberstufe: true,
         uebergangReason: 'MSAgo: Bestanden',
-      }; 
-    }
-  }
-
-    else{
-      return {
-        averageE: averageE,
-        uebergangGymnasialeOberstufe: false,
-        uebergangReason: 'MSAgo: Nein, MSA nicht bestanden',
       };
+    }
     }
   }
 
