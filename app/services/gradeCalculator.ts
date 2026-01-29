@@ -513,7 +513,7 @@ export class GradeCalculator {
     }else  {
       return {
         msaPassed: false,
-        msaStatus: 'MSA: Nicht bestanden, weniger als 2 E-Kurse mit Note 3 oder besser',
+        msaStatus: 'MSA: Nicht bestanden, weniger als 2 E-Kurse insgesamt',
       };
     }    
 
